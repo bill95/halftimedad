@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import FeaturedSponsor from "@/components/FeaturedSponsor";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -77,6 +78,8 @@ export default function Home() {
         <div><b>Private by default</b><span>Your family business stays yours.</span></div>
         <div><b>Made with dads</b><span>Founders help shape the roadmap.</span></div>
       </section>
+
+      <FeaturedSponsor />
 
       <section className="section wrap" id="roadmap">
         <p className="eyebrow">COMING OUT OF THE LOCKER ROOM</p>
