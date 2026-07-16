@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Half Time Dad | Domestic Peace Monitor",
-  description: "A completely unofficial dashboard for tracking the calm.",
+  title: "HalfTimeDad | Helping Dads Win the Second Half",
+  description: "Practical tools, honest support, and a better playbook for divorced and co-parenting dads.",
   metadataBase: new URL("https://halftimedad.co"),
   openGraph: {
-    title: "Domestic Peace Monitor",
-    description: "Track the calm, one day at a time.",
+    title: "Become a Founding Dad",
+    description: "Help build the practical toolkit divorced and co-parenting dads deserve.",
     url: "https://halftimedad.co",
-    siteName: "Half Time Dad",
+    siteName: "HalfTimeDad",
     type: "website",
   },
 };
