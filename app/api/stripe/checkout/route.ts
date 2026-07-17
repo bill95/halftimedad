@@ -8,7 +8,6 @@ type CheckoutPayload = { plan?: "monthly" | "annual"; email?: string; founderNum
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as CheckoutPayload;
-    const plan = body.plan === "monthly" ? "monthly" : "annual";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const founderNumber = Number(body.founderNumber);
     const referralCode = typeof body.referralCode === "string" ? body.referralCode : "";
@@ -19,6 +18,9 @@ export async function POST(request: Request) {
     const reservedFounder = await getFounderForCheckout(founderNumber, email, referralCode);
     if (!reservedFounder) return NextResponse.json({ message: "We could not verify this founding reservation." }, { status: 403 });
     if (reservedFounder.stripe_subscription_id && reservedFounder.status !== "cancelled") return NextResponse.json({ message: "This founding membership already has a Stripe subscription." }, { status: 409 });
+    // The stored reservation is authoritative. This prevents a remount, retry,
+    // or stale browser state from silently switching monthly and annual plans.
+    const plan = reservedFounder.plan_interest;
 
     const stripe = getStripe();
     // Build redirect URLs from the host that received this request. This keeps
