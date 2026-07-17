@@ -21,8 +21,10 @@ export async function POST(request: Request) {
     if (reservedFounder.stripe_subscription_id && reservedFounder.status !== "cancelled") return NextResponse.json({ message: "This founding membership already has a Stripe subscription." }, { status: 409 });
 
     const stripe = getStripe();
-    const configuredSite = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
-    const siteUrl = configuredSite || new URL(request.url).origin;
+    // Build redirect URLs from the host that received this request. This keeps
+    // preview and production checkouts on their own domains and avoids stale or
+    // malformed environment values breaking Stripe Checkout.
+    const siteUrl = new URL(request.url).origin;
     const founder = String(founderNumber);
     const identifierSuffix = Array.from(randomBytes(8), (byte) => String.fromCharCode(97 + (byte % 26))).join("");
     const session = await stripe.checkout.sessions.create({
