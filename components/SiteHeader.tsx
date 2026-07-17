@@ -1,0 +1,2 @@
+import Link from "next/link";
+export default function SiteHeader(){return <header className="site-header"><div className="site-header-inner"><Link className="brand" href="/"><span className="brand-mark"><i/><i/></span><span>HalfTimeDad</span></Link><nav aria-label="Primary navigation"><Link href="/#story">Our story</Link><Link href="/#tools">Tools</Link><Link href="/peace-monitor">Peace Monitor</Link><Link href="/#join">Founding Hundred</Link></nav><Link className="button button-small" href="/#join">Join the village</Link></div></header>}

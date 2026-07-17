@@ -1,0 +1,1 @@
+import type{Metadata}from"next";import Dashboard from"@/components/Dashboard";export const metadata:Metadata={title:"Domestic Peace Monitor",description:"A private, lighthearted dashboard for tracking the calm—one day at a time."};export default function Page(){return <Dashboard/>}
