@@ -1,41 +1,89 @@
-# Half Time Dad
+# HalfTimeDad
 
-A polished, anonymous Domestic Peace Monitor built with Next.js and designed for Vercel.
+Production-ready Next.js site centered on “Perspective before reaction” and The Founding Hundred.
 
-## Features
+## Included
 
-- Anonymous dashboard creation
-- Persistent local counter and statistics
-- Shareable dashboard URLs with no account required
-- Incident resets, longest streaks, averages, predictions, and badges
-- Responsive mobile-first interface
-- No database or environment variables required for v1
+- Story-first responsive homepage
+- $9.99 monthly and $99 annual Stripe subscriptions
+- Stripe-hosted Checkout and a verified webhook
+- Supabase founder-number, billing-status, and referral records
+- Idempotent fulfillment from both the webhook and `/welcome`
+- Domestic Peace Monitor at `/peace-monitor`
+- Privacy, terms, sitemap, robots, and Open Graph metadata
 
-## Run locally
+## 1. Supabase
 
-```bash
-npm install
-npm run dev
-```
+Create a Supabase project and run `supabase.sql` in its SQL Editor. The script works for a fresh table and upgrades the earlier pre-Stripe table.
 
-Open http://localhost:3000.
+## 2. Stripe product and prices
 
-## Deploy to Vercel
+In Stripe **test mode**:
 
-1. Upload all project files to the root of your GitHub repository.
-2. Import the repository into Vercel.
-3. Vercel should detect **Next.js** automatically.
-4. Leave Build and Output Settings at their defaults.
-5. Click **Deploy**.
-6. Add `halftimedad.co` under Project Settings > Domains.
+1. Create one product named `HalfTimeDad Founding Membership`.
+2. Add a recurring monthly price of **$9.99 USD**.
+3. Add a recurring annual price of **$99 USD**.
+4. Copy both `price_...` IDs.
+5. In Branding, add the HalfTimeDad name, icon, colors, and support contact.
+6. Configure the Customer Portal for subscription cancellation and payment-method updates. Do not expose a portal link until the site has authenticated member accounts.
 
-## Sharing model
+## 3. Environment variables
 
-Dashboard state is encoded into the URL fragment after `#d=`. This means:
+Copy `.env.example` to `.env.local` and fill in test values. In Vercel, add the same variables to Preview first:
 
-- Shared links work without a database.
-- Vercel and web servers do not receive the dashboard data in the fragment.
-- A shared dashboard is a snapshot at the time the link is generated.
-- Reset and share again to distribute an updated snapshot.
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SITE_URL` (for example, the preview URL or `https://halftimedad.co`)
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_MONTHLY_PRICE_ID`
+- `STRIPE_ANNUAL_PRICE_ID`
 
-A future database release can add live public profiles, accounts, leaderboards, and incident history.
+Prefer a restricted Stripe key (`rk_test_...` for Preview and `rk_live_...` for Production) with only the permissions this integration needs. Never expose the service-role key or Stripe server key with a `NEXT_PUBLIC_` prefix.
+
+## 4. Stripe webhook
+
+For local testing, use Stripe CLI to forward events to:
+
+`http://localhost:3000/api/stripe/webhook`
+
+For Vercel, register:
+
+`https://YOUR_DOMAIN/api/stripe/webhook`
+
+Subscribe to:
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.async_payment_failed`
+- `invoice.paid`
+- `invoice.payment_failed`
+- `invoice.finalization_failed`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+
+Copy the endpoint’s `whsec_...` secret into `STRIPE_WEBHOOK_SECRET`.
+
+## 5. Run and verify
+
+1. `npm install`
+2. `npm run dev`
+3. Use Stripe’s test card `4242 4242 4242 4242`, any future expiration date, and any three-digit CVC.
+4. Confirm the browser returns to `/welcome`.
+5. Confirm the Supabase row becomes `active` and stores Stripe customer and subscription IDs.
+6. Cancel the test subscription and confirm the Supabase row becomes `cancelled`.
+7. Confirm duplicate event deliveries return successfully without repeating fulfillment.
+8. Run `npm run lint` and `npm run build`.
+
+## Go-live sequence
+
+1. Complete a full test-mode purchase on a Vercel preview.
+2. Confirm webhook delivery succeeds in Stripe.
+3. Confirm the Supabase membership status is accurate.
+4. Create or copy the product and both prices into Stripe live mode.
+5. Replace test secret, webhook secret, and price IDs with live values in Vercel Production.
+6. Verify the business name, statement descriptor, receipt email, support details, cancellation terms, tax settings, and refund policy in Stripe.
+7. Have qualified counsel review the privacy policy and terms.
+8. Deploy production and complete one small live transaction before announcing enrollment.
+
+Stripe Checkout creates subscriptions; the webhook is the source of truth for membership access. Never grant access based only on a browser redirect.

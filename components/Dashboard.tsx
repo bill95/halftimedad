@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type DashboardState = {
   createdAt: number;
@@ -69,9 +70,8 @@ export default function Dashboard() {
     const local = localStorage.getItem(STORAGE_KEY);
     const stored = local ? decodeState(local) : null;
     const initial = shared ?? stored ?? freshState();
-    setState(initial);
-    localStorage.setItem(STORAGE_KEY, encodeState(initial));
-    if (shared) setToast("Shared dashboard loaded");
+    const timer = window.setTimeout(() => { setState(initial); localStorage.setItem(STORAGE_KEY, encodeState(initial)); if (shared) setToast("Shared dashboard loaded"); }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -154,15 +154,15 @@ export default function Dashboard() {
     setToast("New dashboard created");
   }
 
-  if (!state) return <main className="loading">Calibrating domestic stability...</main>;
+  if (!state) return <main className="monitor-loading">Calibrating domestic stability...</main>;
 
   return (
-    <main className="shell">
+    <main className="monitor-shell">
       <header className="nav">
-        <a className="logo" href="/" aria-label="Half Time Dad home">
+        <Link className="logo" href="/" aria-label="HalfTimeDad home">
           <span className="signal" />
-          <span>Half Time Dad</span>
-        </a>
+          <span>HalfTimeDad</span>
+        </Link>
         <div className="nav-actions">
           <button className="ghost" onClick={() => setShowCreate(true)}>New dashboard</button>
           <button className="light" onClick={share}>Share</button>
@@ -239,7 +239,7 @@ export default function Dashboard() {
         </article>
       </section>
 
-      <footer>Built for dads navigating the second half. No actual emotional stability should be inferred from this dashboard.</footer>
+      <footer>Built for dads navigating the second half. A lighthearted reflection tool—not a clinical assessment or professional advice.</footer>
 
       {showCreate && (
         <div className="modal-backdrop" onClick={() => setShowCreate(false)}>

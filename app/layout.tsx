@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./stripe.css";
 
 export const metadata: Metadata = {
-  title: "Half Time Dad | Domestic Peace Monitor",
-  description: "A completely unofficial dashboard for tracking the calm.",
+  title: { default: "HalfTimeDad | Perspective Before Reaction", template: "%s | HalfTimeDad" },
+  description: "Practical tools and a supportive village helping dads think clearly, reduce stress, and keep their kids at the center.",
   metadataBase: new URL("https://halftimedad.co"),
   openGraph: {
-    title: "Domestic Peace Monitor",
-    description: "Track the calm, one day at a time.",
+    title: "HalfTimeDad | The Founding Hundred",
+    description: "Perspective before reaction. Join the first 100 dads helping build the village before October 1, 2026.",
     url: "https://halftimedad.co",
-    siteName: "Half Time Dad",
+    siteName: "HalfTimeDad",
     type: "website",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "HalfTimeDad — Perspective before reaction" }],
   },
+  twitter: { card: "summary_large_image", title: "HalfTimeDad | The Founding Hundred", description: "Perspective before reaction.", images: ["/og.jpg"] },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
