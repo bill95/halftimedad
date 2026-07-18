@@ -5,6 +5,12 @@ type FounderUpdate = {
   activated_at?: string | null;
 };
 
+type StripeWebhookEvent = {
+  id: string;
+  type: string;
+  created: number;
+};
+
 export type FounderCheckoutRecord = {
   founder_number: number;
   email: string;
@@ -40,4 +46,42 @@ export async function getFounderForCheckout(founderNumber: number, email: string
   if (!response.ok) throw new Error(`Supabase founder lookup failed (${response.status})`);
   const [founder] = (await response.json()) as FounderCheckoutRecord[];
   return founder ?? null;
+}
+
+export async function claimStripeWebhookEvent(event: StripeWebhookEvent) {
+  const { base, headers } = config();
+  const response = await fetch(`${base}/rest/v1/stripe_webhook_events?on_conflict=event_id`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json", Prefer: "resolution=ignore-duplicates,return=representation" },
+    body: JSON.stringify({
+      event_id: event.id,
+      event_type: event.type,
+      stripe_created_at: new Date(event.created * 1000).toISOString(),
+    }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Supabase Stripe event claim failed (${response.status})`);
+  const inserted = (await response.json()) as Array<{ event_id: string }>;
+  return inserted.length === 1;
+}
+
+export async function completeStripeWebhookEvent(eventId: string) {
+  const { base, headers } = config();
+  const response = await fetch(`${base}/rest/v1/stripe_webhook_events?event_id=eq.${encodeURIComponent(eventId)}`, {
+    method: "PATCH",
+    headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({ processed_at: new Date().toISOString() }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Supabase Stripe event completion failed (${response.status})`);
+}
+
+export async function releaseStripeWebhookEvent(eventId: string) {
+  const { base, headers } = config();
+  const response = await fetch(`${base}/rest/v1/stripe_webhook_events?event_id=eq.${encodeURIComponent(eventId)}&processed_at=is.null`, {
+    method: "DELETE",
+    headers: { ...headers, Prefer: "return=minimal" },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Supabase Stripe event release failed (${response.status})`);
 }

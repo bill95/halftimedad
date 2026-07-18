@@ -6,6 +6,10 @@ function id(value: string | Stripe.Customer | Stripe.DeletedCustomer | Stripe.Su
   return typeof value === "string" ? value : value?.id ?? null;
 }
 
+function subscriptionId(value: string | Stripe.Subscription | null | undefined) {
+  return typeof value === "string" ? value : value?.id ?? null;
+}
+
 export async function activateCheckoutSession(sessionId: string) {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -30,4 +34,20 @@ export async function syncSubscription(subscription: Stripe.Subscription) {
     stripe_customer_id: id(subscription.customer),
     stripe_subscription_id: subscription.id,
   });
+}
+
+export async function syncCurrentSubscription(subscription: string | Stripe.Subscription | null | undefined) {
+  const currentId = subscriptionId(subscription);
+  if (!currentId) return;
+  const current = await getStripe().subscriptions.retrieve(currentId);
+  await syncSubscription(current);
+}
+
+export async function syncCheckoutFailure(sessionId: string) {
+  const session = await getStripe().checkout.sessions.retrieve(sessionId);
+  await syncCurrentSubscription(session.subscription);
+}
+
+export async function syncInvoiceSubscription(invoice: Stripe.Invoice) {
+  await syncCurrentSubscription(invoice.parent?.subscription_details?.subscription);
 }

@@ -39,7 +39,7 @@ Copy `.env.example` to `.env.local` and fill in test values. In Vercel, add the 
 - `STRIPE_MONTHLY_PRICE_ID`
 - `STRIPE_ANNUAL_PRICE_ID`
 
-Never expose the service-role key or Stripe secret key with a `NEXT_PUBLIC_` prefix.
+Prefer a restricted Stripe key (`rk_test_...` for Preview and `rk_live_...` for Production) with only the permissions this integration needs. Never expose the service-role key or Stripe server key with a `NEXT_PUBLIC_` prefix.
 
 ## 4. Stripe webhook
 
@@ -55,6 +55,10 @@ Subscribe to:
 
 - `checkout.session.completed`
 - `checkout.session.async_payment_succeeded`
+- `checkout.session.async_payment_failed`
+- `invoice.paid`
+- `invoice.payment_failed`
+- `invoice.finalization_failed`
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
 
@@ -67,7 +71,9 @@ Copy the endpoint’s `whsec_...` secret into `STRIPE_WEBHOOK_SECRET`.
 3. Use Stripe’s test card `4242 4242 4242 4242`, any future expiration date, and any three-digit CVC.
 4. Confirm the browser returns to `/welcome`.
 5. Confirm the Supabase row becomes `active` and stores Stripe customer and subscription IDs.
-6. Run `npm run lint` and `npm run build`.
+6. Cancel the test subscription and confirm the Supabase row becomes `cancelled`.
+7. Confirm duplicate event deliveries return successfully without repeating fulfillment.
+8. Run `npm run lint` and `npm run build`.
 
 ## Go-live sequence
 

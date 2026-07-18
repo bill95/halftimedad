@@ -31,4 +31,16 @@ grant usage, select on sequence public.founding_members_founder_number_seq to se
 create index if not exists founding_members_referral_code_idx on public.founding_members(referral_code);
 create index if not exists founding_members_referred_by_idx on public.founding_members(referred_by);
 create unique index if not exists founding_members_stripe_subscription_idx on public.founding_members(stripe_subscription_id) where stripe_subscription_id is not null;
+
+create table if not exists public.stripe_webhook_events (
+  event_id text primary key,
+  event_type text not null,
+  stripe_created_at timestamptz not null,
+  claimed_at timestamptz not null default now(),
+  processed_at timestamptz
+);
+alter table public.stripe_webhook_events enable row level security;
+revoke all on table public.stripe_webhook_events from anon, authenticated;
+grant select, insert, update, delete on table public.stripe_webhook_events to service_role;
+create index if not exists stripe_webhook_events_processed_at_idx on public.stripe_webhook_events(processed_at);
 -- No public policies: the server-only API writes with the service role key.
