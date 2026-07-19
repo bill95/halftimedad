@@ -61,6 +61,7 @@ export default function Dashboard() {
   const [state, setState] = useState<DashboardState | null>(null);
   const [toast, setToast] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [isSharedView, setIsSharedView] = useState(false);
 
   useEffect(() => {
     const hashValue = window.location.hash.startsWith("#d=")
@@ -70,7 +71,13 @@ export default function Dashboard() {
     const local = localStorage.getItem(STORAGE_KEY);
     const stored = local ? decodeState(local) : null;
     const initial = shared ?? stored ?? freshState();
-    const timer = window.setTimeout(() => { setState(initial); localStorage.setItem(STORAGE_KEY, encodeState(initial)); if (shared) setToast("Shared dashboard loaded"); }, 0);
+    const viewingSomeoneElsesDashboard = Boolean(shared && (!stored || shared.id !== stored.id));
+    const timer = window.setTimeout(() => {
+      setState(initial);
+      setIsSharedView(viewingSomeoneElsesDashboard);
+      if (!viewingSomeoneElsesDashboard) localStorage.setItem(STORAGE_KEY, encodeState(initial));
+      if (viewingSomeoneElsesDashboard) setToast("Shared dashboard loaded — start your own to track your streak");
+    }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -108,6 +115,10 @@ export default function Dashboard() {
 
   function reset() {
     if (!state) return;
+    if (isSharedView) {
+      setShowCreate(true);
+      return;
+    }
     const ok = window.confirm(
       "Confirm new incident?\n\nThis resets the counter and enters the event into the completely unofficial permanent record."
     );
@@ -150,8 +161,9 @@ export default function Dashboard() {
   function createNew() {
     const next = freshState();
     persist(next, true);
+    setIsSharedView(false);
     setShowCreate(false);
-    setToast("New dashboard created");
+    setToast("Your Peace Monitor is ready — bookmark this page");
   }
 
   if (!state) return <main className="monitor-loading">Calibrating domestic stability...</main>;
@@ -174,7 +186,7 @@ export default function Dashboard() {
           <p className="eyebrow">Domestic Peace Monitor™</p>
           <h1>Track the calm.<br />One day at a time.</h1>
           <p className="lede">A completely unofficial incident dashboard built on hope, selective memory, and no reliable scientific evidence.</p>
-          <div className="identity">DASHBOARD ID · {state.id}</div>
+          <div className="identity">{isSharedView ? "SHARED DASHBOARD" : "YOUR DASHBOARD"} · {state.id}</div>
         </div>
         <div className="counter-wrap">
           <div className="counter">
@@ -188,6 +200,7 @@ export default function Dashboard() {
           <div><span>Last incident</span><strong>{currentDays === 0 ? "Today" : `${currentDays} day${currentDays === 1 ? "" : "s"} ago`}</strong></div>
           <div><span>System status</span><strong>Monitoring texts</strong></div>
         </div>
+        <div className={`bookmark-note ${isSharedView ? "shared" : ""}`}>{isSharedView ? <><strong>Want to track your own streak?</strong><span>Create your own private monitor below. This shared dashboard will stay unchanged.</span></> : <><strong>Keep your monitor handy.</strong><span>It is saved in this browser. Bookmark this page so it is easy to return.</span></>}</div>
       </section>
 
       <section className="grid">
@@ -199,7 +212,7 @@ export default function Dashboard() {
             <div className="metric"><strong>{state.lifetimeResets}</strong><span>Lifetime incidents</span></div>
             <div className="metric"><strong>{average}</strong><span>Average peaceful days</span></div>
           </div>
-          <button className="danger" onClick={reset}>🚨 Record new incident</button>
+          <button className={isSharedView ? "light own-monitor" : "danger"} onClick={reset}>{isSharedView ? "Start your own Peace Monitor" : "🚨 Record new incident"}</button>
           <p className="fine">Last reset: {new Date(state.lastReset).toLocaleString()}</p>
         </article>
 
@@ -245,8 +258,8 @@ export default function Dashboard() {
         <div className="modal-backdrop" onClick={() => setShowCreate(false)}>
           <div className="modal" onClick={(event) => event.stopPropagation()}>
             <p className="eyebrow">Fresh start</p>
-            <h2>Create a new dashboard?</h2>
-            <p>This creates a clean, anonymous dashboard with a new ID. Your current dashboard remains available through its existing share link.</p>
+            <h2>{isSharedView ? "Start your own Peace Monitor?" : "Create a new dashboard?"}</h2>
+            <p>{isSharedView ? "This creates a clean, private dashboard saved in your browser. Bookmark it after creating it so you can return easily." : "This creates a clean, anonymous dashboard with a new ID. Your current dashboard remains available through its existing share link."}</p>
             <div className="modal-actions"><button className="ghost" onClick={() => setShowCreate(false)}>Cancel</button><button className="light" onClick={createNew}>Create dashboard</button></div>
           </div>
         </div>

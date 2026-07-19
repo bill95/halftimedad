@@ -44,8 +44,31 @@
 .welcome-page aside strong, .welcome-page aside span { display: block; }
 .welcome-page aside strong { font: 500 28px Georgia, serif; }
 .welcome-page aside span { margin-top: 8px; color: var(--muted); }
+.welcome-share { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.welcome-share > span { margin: 0 0 14px; font-weight: 750; }
+.welcome-share .button { color: var(--ink); }
 
 @media (max-width: 680px) {
   .welcome-page { padding: 76px 0; }
   .welcome-actions { align-items: stretch; flex-direction: column; }
+}
+
+.monitor-shell .bookmark-note {
+  grid-column: 1 / -1;
+  padding: 17px 22px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid var(--mline);
+  color: var(--mmuted);
+  background: rgba(67, 229, 154, .04);
+  font-size: 12px;
+}
+
+.monitor-shell .bookmark-note strong { color: var(--mtext); }
+.monitor-shell .bookmark-note.shared { background: rgba(244, 247, 245, .04); }
+.monitor-shell .own-monitor { width: 100%; margin-top: 14px; }
+
+@media (max-width: 680px) {
+  .monitor-shell .bookmark-note { align-items: flex-start; flex-direction: column; }
 }
