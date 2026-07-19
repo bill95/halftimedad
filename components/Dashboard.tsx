@@ -12,7 +12,10 @@ type DashboardState = {
   id: string;
 };
 
+type ViewMode = "public" | "shared" | "own";
+
 const STORAGE_KEY = "halftimedad-dashboard-v1";
+const OWNER_KEY = "halftimedad-dashboard-owner-v1";
 const DAY = 86_400_000;
 
 function randomId() {
@@ -28,6 +31,18 @@ function freshState(): DashboardState {
     lifetimeResets: 0,
     totalCompletedDays: 0,
     id: randomId(),
+  };
+}
+
+function publicDemoState(): DashboardState {
+  const now = Date.now();
+  return {
+    createdAt: now - 90 * DAY,
+    lastReset: now - 12 * DAY,
+    longestStreak: 21,
+    lifetimeResets: 3,
+    totalCompletedDays: 32,
+    id: "DEMO01",
   };
 }
 
@@ -61,22 +76,35 @@ export default function Dashboard() {
   const [state, setState] = useState<DashboardState | null>(null);
   const [toast, setToast] = useState("");
   const [showCreate, setShowCreate] = useState(false);
-  const [isSharedView, setIsSharedView] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("public");
 
   useEffect(() => {
-    const hashValue = window.location.hash.startsWith("#d=")
+    const hash = window.location.hash;
+    const hashValue = hash.startsWith("#d=")
       ? window.location.hash.slice(3)
       : "";
     const shared = hashValue ? decodeState(hashValue) : null;
     const local = localStorage.getItem(STORAGE_KEY);
     const stored = local ? decodeState(local) : null;
-    const initial = shared ?? stored ?? freshState();
-    const viewingSomeoneElsesDashboard = Boolean(shared && (!stored || shared.id !== stored.id));
+    const ownerId = localStorage.getItem(OWNER_KEY);
+    let initial = publicDemoState();
+    let mode: ViewMode = "public";
+
+    if (hash === "#mine") {
+      initial = stored && ownerId === stored.id ? stored : freshState();
+      mode = "own";
+      localStorage.setItem(STORAGE_KEY, encodeState(initial));
+      localStorage.setItem(OWNER_KEY, initial.id);
+    } else if (shared) {
+      const belongsToThisBrowser = ownerId === shared.id;
+      initial = belongsToThisBrowser && stored?.id === shared.id ? stored : shared;
+      mode = belongsToThisBrowser ? "own" : "shared";
+    }
+
     const timer = window.setTimeout(() => {
       setState(initial);
-      setIsSharedView(viewingSomeoneElsesDashboard);
-      if (!viewingSomeoneElsesDashboard) localStorage.setItem(STORAGE_KEY, encodeState(initial));
-      if (viewingSomeoneElsesDashboard) setToast("Shared dashboard loaded — start your own to track your streak");
+      setViewMode(mode);
+      if (mode === "shared") setToast("Shared dashboard loaded — start your own to track your streak");
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
@@ -110,12 +138,14 @@ export default function Dashboard() {
     setState(next);
     const encoded = encodeState(next);
     localStorage.setItem(STORAGE_KEY, encoded);
-    if (updateUrl) history.replaceState(null, "", `#d=${encoded}`);
+    localStorage.setItem(OWNER_KEY, next.id);
+    setViewMode("own");
+    if (updateUrl) history.replaceState(null, "", "#mine");
   }
 
   function reset() {
     if (!state) return;
-    if (isSharedView) {
+    if (viewMode !== "own") {
       setShowCreate(true);
       return;
     }
@@ -141,7 +171,6 @@ export default function Dashboard() {
     if (!state) return;
     const encoded = encodeState({ ...state, longestStreak: longest });
     const url = `${window.location.origin}${window.location.pathname}#d=${encoded}`;
-    history.replaceState(null, "", `#d=${encoded}`);
     const data = {
       title: "Domestic Peace Monitor",
       text: `${currentDays} days incident free. Threat level: ${status.label}.`,
@@ -161,7 +190,6 @@ export default function Dashboard() {
   function createNew() {
     const next = freshState();
     persist(next, true);
-    setIsSharedView(false);
     setShowCreate(false);
     setToast("Your Peace Monitor is ready — bookmark this page");
   }
@@ -176,7 +204,7 @@ export default function Dashboard() {
           <span>HalfTimeDad</span>
         </Link>
         <div className="nav-actions">
-          <button className="ghost" onClick={() => setShowCreate(true)}>New dashboard</button>
+          <button className="ghost" onClick={() => setShowCreate(true)}>{viewMode === "own" ? "New dashboard" : "Create your monitor"}</button>
           <button className="light" onClick={share}>Share</button>
         </div>
       </header>
@@ -186,7 +214,7 @@ export default function Dashboard() {
           <p className="eyebrow">Domestic Peace Monitor™</p>
           <h1>Track the calm.<br />One day at a time.</h1>
           <p className="lede">A completely unofficial incident dashboard built on hope, selective memory, and no reliable scientific evidence.</p>
-          <div className="identity">{isSharedView ? "SHARED DASHBOARD" : "YOUR DASHBOARD"} · {state.id}</div>
+          <div className="identity">{viewMode === "public" ? "PUBLIC DEMO" : viewMode === "shared" ? "SHARED DASHBOARD" : "YOUR DASHBOARD"} · {state.id}</div>
         </div>
         <div className="counter-wrap">
           <div className="counter">
@@ -200,7 +228,7 @@ export default function Dashboard() {
           <div><span>Last incident</span><strong>{currentDays === 0 ? "Today" : `${currentDays} day${currentDays === 1 ? "" : "s"} ago`}</strong></div>
           <div><span>System status</span><strong>Monitoring texts</strong></div>
         </div>
-        <div className={`bookmark-note ${isSharedView ? "shared" : ""}`}>{isSharedView ? <><strong>Want to track your own streak?</strong><span>Create your own private monitor below. This shared dashboard will stay unchanged.</span></> : <><strong>Keep your monitor handy.</strong><span>It is saved in this browser. Bookmark this page so it is easy to return.</span></>}</div>
+        <div className={`bookmark-note ${viewMode !== "own" ? "shared" : ""}`}>{viewMode !== "own" ? <><strong>Want to track your own streak?</strong><span>Create your own private monitor below. {viewMode === "public" ? "The public demo will stay unchanged." : "This shared dashboard will stay unchanged."}</span></> : <><strong>Keep your monitor handy.</strong><span>It is saved in this browser. Bookmark this page so it is easy to return.</span></>}</div>
       </section>
 
       <section className="grid">
@@ -212,7 +240,7 @@ export default function Dashboard() {
             <div className="metric"><strong>{state.lifetimeResets}</strong><span>Lifetime incidents</span></div>
             <div className="metric"><strong>{average}</strong><span>Average peaceful days</span></div>
           </div>
-          <button className={isSharedView ? "light own-monitor" : "danger"} onClick={reset}>{isSharedView ? "Start your own Peace Monitor" : "🚨 Record new incident"}</button>
+          <button className={viewMode !== "own" ? "light own-monitor" : "danger"} onClick={reset}>{viewMode !== "own" ? "Create your own Peace Monitor" : "🚨 Record new incident"}</button>
           <p className="fine">Last reset: {new Date(state.lastReset).toLocaleString()}</p>
         </article>
 
@@ -258,8 +286,8 @@ export default function Dashboard() {
         <div className="modal-backdrop" onClick={() => setShowCreate(false)}>
           <div className="modal" onClick={(event) => event.stopPropagation()}>
             <p className="eyebrow">Fresh start</p>
-            <h2>{isSharedView ? "Start your own Peace Monitor?" : "Create a new dashboard?"}</h2>
-            <p>{isSharedView ? "This creates a clean, private dashboard saved in your browser. Bookmark it after creating it so you can return easily." : "This creates a clean, anonymous dashboard with a new ID. Your current dashboard remains available through its existing share link."}</p>
+            <h2>{viewMode !== "own" ? "Create your own Peace Monitor?" : "Create a new dashboard?"}</h2>
+            <p>{viewMode !== "own" ? "This creates a clean, private dashboard saved in your browser. Bookmark it after creating it so you can return easily." : "This creates a clean, anonymous dashboard with a new ID. Your current dashboard remains available through its existing share link."}</p>
             <div className="modal-actions"><button className="ghost" onClick={() => setShowCreate(false)}>Cancel</button><button className="light" onClick={createNew}>Create dashboard</button></div>
           </div>
         </div>
