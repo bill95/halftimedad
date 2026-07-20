@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./stripe.css";
+import "./newsletter.css";
 
 export const metadata: Metadata = {
   title: { default: "HalfTimeDad | Perspective Before Reaction", template: "%s | HalfTimeDad" },
