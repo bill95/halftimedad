@@ -39,18 +39,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "We could not complete your signup. Please try again." }, { status: 500 });
     }
 
+    const contactData = (await contactRes.json()) as { id?: string };
+    const contactId = contactData.id;
+
     // Subscribe to the Sunday Reset topic if configured
-    if (topicId) {
-      const contactData = (await contactRes.json()) as { id?: string };
-      const contactId = contactData.id;
-      if (contactId) {
-        await fetch(`https://api.resend.com/audiences/${audienceId}/contacts/${contactId}/topics/${topicId}`, {
-          method: "POST",
-          headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ subscribed: true }),
-        }).catch((err) => console.error("Newsletter: topic subscription failed", err));
-      }
+    if (topicId && contactId) {
+      await fetch(`https://api.resend.com/audiences/${audienceId}/contacts/${contactId}/topics/${topicId}`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ subscribed: true }),
+      }).catch((err) => console.error("Newsletter: topic subscription failed", err));
     }
+
+    // Fire custom event to trigger Resend automation welcome sequence
+    await fetch("https://api.resend.com/emails/events", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event_name: "sunday_reset.subscribed",
+        email,
+        data: { first_name: firstName || "" },
+      }),
+    }).catch((err) => console.error("Newsletter: automation event failed", err));
 
     return NextResponse.json({ success: true });
   } catch (error) {
