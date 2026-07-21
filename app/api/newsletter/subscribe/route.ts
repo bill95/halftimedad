@@ -55,23 +55,24 @@ export async function POST(req: NextRequest) {
     }
 
     // Fire custom event to trigger Resend automation welcome sequence
-    // Correct endpoint: POST /events with email to identify the contact
-    const eventRes = await fetch("https://api.resend.com/events", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        event: "sunday_reset.subscribed",
-        name: "sunday_reset.subscribed",
-        email,
-        payload: { first_name: firstName || "" },
-      }),
-    });
+    // POST /events/send fires an existing event for a specific contact
+    if (contactId) {
+      const eventRes = await fetch("https://api.resend.com/events/send", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "sunday_reset.subscribed",
+          contact_id: contactId,
+          payload: { first_name: firstName || "" },
+        }),
+      });
 
-    if (!eventRes.ok) {
-      const eventErr = await eventRes.text();
-      console.error("Newsletter: automation event failed", eventRes.status, eventErr);
-    } else {
-      console.log("Newsletter: automation event fired successfully", eventRes.status);
+      if (!eventRes.ok) {
+        const eventErr = await eventRes.text();
+        console.error("Newsletter: automation event failed", eventRes.status, eventErr);
+      } else {
+        console.log("Newsletter: automation event fired successfully", eventRes.status);
+      }
     }
 
     return NextResponse.json({ success: true });
