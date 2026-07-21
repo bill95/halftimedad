@@ -44,23 +44,34 @@ export async function POST(req: NextRequest) {
 
     // Subscribe to the Sunday Reset topic if configured
     if (topicId && contactId) {
-      await fetch(`https://api.resend.com/audiences/${audienceId}/contacts/${contactId}/topics/${topicId}`, {
+      const topicRes = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts/${contactId}/topics/${topicId}`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({ subscribed: true }),
-      }).catch((err) => console.error("Newsletter: topic subscription failed", err));
+      });
+      if (!topicRes.ok) {
+        console.error("Newsletter: topic subscription failed", topicRes.status, await topicRes.text());
+      }
     }
 
     // Fire custom event to trigger Resend automation welcome sequence
-    await fetch("https://api.resend.com/emails/events", {
+    // Correct endpoint: POST /events with email to identify the contact
+    const eventRes = await fetch("https://api.resend.com/events", {
       method: "POST",
       headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        event_name: "sunday_reset.subscribed",
+        event: "sunday_reset.subscribed",
         email,
-        data: { first_name: firstName || "" },
+        payload: { first_name: firstName || "" },
       }),
-    }).catch((err) => console.error("Newsletter: automation event failed", err));
+    });
+
+    if (!eventRes.ok) {
+      const eventErr = await eventRes.text();
+      console.error("Newsletter: automation event failed", eventRes.status, eventErr);
+    } else {
+      console.log("Newsletter: automation event fired successfully", eventRes.status);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
