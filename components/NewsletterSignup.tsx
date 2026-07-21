@@ -33,7 +33,7 @@ export default function NewsletterSignup({ variant = "inline" }: Props) {
     return (
       <div className={`newsletter-success newsletter-success--${variant}`} role="status">
         <span>✓</span>
-        <p>You&rsquo;re in. First issue arrives Sunday.</p>
+        <p>You&rsquo;re in. Check your inbox &mdash; your first note is on its way.</p>
       </div>
     );
   }
