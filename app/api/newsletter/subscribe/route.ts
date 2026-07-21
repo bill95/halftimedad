@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
       headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         event: "sunday_reset.subscribed",
+        name: "sunday_reset.subscribed",
         email,
         payload: { first_name: firstName || "" },
       }),
