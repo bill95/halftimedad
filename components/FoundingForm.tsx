@@ -10,6 +10,7 @@ export default function FoundingForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "checkout-error">("idle");
   const [result, setResult] = useState<Result>({});
   const [email, setEmail] = useState("");
+  const [newsletter, setNewsletter] = useState(false);
 
   async function openCheckout(details: { email: string; founderNumber: number; referralCode?: string }) {
     const response = await fetch("/api/stripe/checkout", {
@@ -38,6 +39,14 @@ export default function FoundingForm() {
       const saved = (await response.json()) as Result;
       if (!response.ok || !saved.founderNumber) throw new Error(saved.message || "We could not reserve your founder number.");
       setResult(saved);
+      // Newsletter opt-in — non-blocking, does not affect checkout
+      if (newsletter && submittedEmail) {
+        fetch("/api/newsletter/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: submittedEmail, firstName: String(payload.firstName || "") }),
+        }).catch(() => { /* silent — newsletter signup must never block checkout */ });
+      }
       await openCheckout({ email: submittedEmail, founderNumber: saved.founderNumber, referralCode: saved.referralCode });
     } catch (error) {
       setResult((current) => ({ ...current, message: error instanceof Error ? error.message : "Something went wrong." }));
@@ -68,6 +77,7 @@ export default function FoundingForm() {
     <p className="form-explainer">Membership begins today. After reserving your founder number, you’ll continue to Stripe’s secure checkout.</p>
     <div className="field-row"><label><span>First name</span><input name="firstName" autoComplete="given-name" required /></label><label><span>Email</span><input name="email" type="email" autoComplete="email" required /></label></div>
     <label><span>What would help most right now? <em>Optional</em></span><textarea name="challenge" rows={3} placeholder="A difficult message, parenting schedule, money, feeling less alone…" /></label>
+    <label className="newsletter-checkbox-label"><input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} /><span>Also subscribe me to <strong>The Sunday Reset</strong> — a free weekly note from Founding Dad #001.</span></label>
     <button className="button button-primary submit-button" disabled={status === "loading"}>{status === "loading" ? "Opening secure checkout…" : `Continue with the ${plan === "annual" ? "$99 annual" : "$9.99 monthly"} plan`}</button>
     <p className="privacy-note">Payments are securely processed by Stripe. Cancel anytime. We never sell your information.</p>
     {status === "checkout-error" && <p className="form-error" role="alert">{result.message} You have not been charged.</p>}
