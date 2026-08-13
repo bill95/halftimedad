@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import MemberHeader from "@/components/MemberHeader";
 import { createClient } from "@/lib/supabase/server";
 import AcceptCharter from "./AcceptCharter";
 import {
@@ -41,7 +41,7 @@ export default async function CharterPage() {
 
   return (
     <>
-      <SiteHeader />
+      <MemberHeader />
       <main className="section-shell charter-page">
         <p className="kicker">
           {reaccepting ? "The charter has changed" : "One thing before you go in"}

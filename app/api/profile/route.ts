@@ -35,8 +35,7 @@ export async function POST(request: Request) {
 
   const { error } = await supabase
     .from("member_profiles")
-    .update(update)
-    .eq("user_id", user.id);
+    .upsert({ user_id: user.id, ...update }, { onConflict: "user_id" });
 
   if (error) {
     console.error("Profile save failed", error);

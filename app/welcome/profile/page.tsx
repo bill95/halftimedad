@@ -1,5 +1,5 @@
 import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import MemberHeader from "@/components/MemberHeader";
 import { requireMember } from "@/lib/member";
 import ProfileForm from "./ProfileForm";
 
@@ -13,7 +13,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <SiteHeader />
+      <MemberHeader />
       <main className="section-shell charter-page">
         <p className="kicker">Four questions</p>
         <h1>Where you are</h1>

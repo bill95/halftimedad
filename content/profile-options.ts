@@ -46,8 +46,8 @@ export const CUSTODY: Option<Custody>[] = [
 
 export const CONFLICT: Option<Conflict>[] = [
   { value: "low", label: "Mostly calm", hint: "We can talk" },
-  { value: "managed", label: "Manageable with effort", hint: "It works if I'm careful" },
-  { value: "high", label: "Hard", hint: "Most exchanges cost me something" },
+  { value: "managed", label: "Workable with effort", hint: "It goes fine if I'm careful" },
+  { value: "high", label: "Costs me something", hint: "Most exchanges take a toll" },
 ];
 
 export const FOCUS_AREAS: Option<FocusArea>[] = [

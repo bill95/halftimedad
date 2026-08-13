@@ -14,13 +14,14 @@ export async function POST() {
 
   // Written as the member, not the service role, so RLS is the thing enforcing
   // that a member can only ever accept on their own behalf.
-  const { error } = await supabase
-    .from("member_profiles")
-    .update({
+  const { error } = await supabase.from("member_profiles").upsert(
+    {
+      user_id: user.id,
       charter_accepted_at: new Date().toISOString(),
       charter_version: CHARTER_VERSION,
-    })
-    .eq("user_id", user.id);
+    },
+    { onConflict: "user_id" }
+  );
 
   if (error) {
     console.error("Charter acceptance failed", error);

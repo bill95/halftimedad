@@ -1,6 +1,6 @@
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import MemberHeader from "@/components/MemberHeader";
 import { createClient } from "@/lib/supabase/server";
 import { requireMember, weekOf } from "@/lib/member";
 import {
@@ -49,6 +49,15 @@ export default async function MemberHome() {
   ]);
 
   const done = Boolean(thisWeek);
+  // badges(label) is a joined row; Supabase types it as object or array
+  // depending on the relationship, so normalise before reading it.
+  const badgeLabels = (badges ?? [])
+    .map((row) => {
+      const joined = row.badges as unknown;
+      if (Array.isArray(joined)) return (joined[0] as { label?: string })?.label;
+      return (joined as { label?: string } | null)?.label;
+    })
+    .filter((label): label is string => Boolean(label));
   const situation = [
     labelFor(STAGES, member.profile?.stage as Stage | null),
     labelFor(CUSTODY, member.profile?.custody as Custody | null),
@@ -63,7 +72,7 @@ export default async function MemberHome() {
 
   return (
     <>
-      <SiteHeader />
+      <MemberHeader founderNumber={member.founderNumber} />
       <main className="section-shell member-home">
         <div className="member-masthead">
           <span>HalfTimeDad</span>
@@ -128,7 +137,7 @@ export default async function MemberHome() {
           <section className="member-tile">
             <p className="member-tile-label">Standing</p>
             <p className="member-tile-value">
-              {badges?.length ? badges.map((b) => b.badge_slug.replace(/_/g, " ")).join(", ") : "—"}
+              {badgeLabels.length ? badgeLabels.join(", ") : "None yet"}
             </p>
             <p className="member-tile-hint">
               {member.founderNumber ? "Permanent. Yours as long as you stay." : ""}

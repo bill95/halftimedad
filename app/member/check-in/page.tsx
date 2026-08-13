@@ -1,5 +1,5 @@
 import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
+import MemberHeader from "@/components/MemberHeader";
 import { createClient } from "@/lib/supabase/server";
 import { requireMember, weekOf } from "@/lib/member";
 import CheckInForm from "./CheckInForm";
@@ -22,7 +22,7 @@ export default async function CheckInPage() {
 
   return (
     <>
-      <SiteHeader />
+      <MemberHeader />
       <main className="section-shell charter-page">
         <p className="kicker">{existing ? "Editing this week" : "This week"}</p>
         <h1>The check-in</h1>
