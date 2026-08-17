@@ -1,9 +1,16 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { pricingFor, type Plan } from "@/content/pricing";
 
-type Plan = "monthly" | "annual";
 type Result = { founderNumber?: number; message?: string; referralCode?: string };
+
+// Both tiers happen to save the same 17% on annual ($99 vs $119.88, $190 vs $228).
+// Recheck this number if either price ever changes.
+const ANNUAL_SAVINGS = "Save 17%";
+
+const MONTHLY = pricingFor("monthly");
+const ANNUAL = pricingFor("annual");
 
 export default function FoundingForm() {
   const [plan, setPlan] = useState<Plan>("annual");
@@ -11,6 +18,8 @@ export default function FoundingForm() {
   const [result, setResult] = useState<Result>({});
   const [email, setEmail] = useState("");
   const [newsletter, setNewsletter] = useState(false);
+
+  const selected = plan === "annual" ? ANNUAL : MONTHLY;
 
   async function openCheckout(details: { email: string; founderNumber: number; referralCode?: string }) {
     const response = await fetch("/api/stripe/checkout", {
@@ -70,15 +79,15 @@ export default function FoundingForm() {
   }
 
   return <form className="signup-card" onSubmit={submit}>
-    <div className="plan-toggle" aria-label="Choose a founding plan">
-      <button type="button" className={plan === "monthly" ? "active" : ""} onClick={() => setPlan("monthly")} aria-pressed={plan === "monthly"}><span>Monthly</span><strong>$9.99 <small>/ month</small></strong></button>
-      <button type="button" className={plan === "annual" ? "active" : ""} onClick={() => setPlan("annual")} aria-pressed={plan === "annual"}><span>Annual · Save 17%</span><strong>$99 <small>/ year</small></strong></button>
+    <div className="plan-toggle" aria-label="Choose a plan">
+      <button type="button" className={plan === "monthly" ? "active" : ""} onClick={() => setPlan("monthly")} aria-pressed={plan === "monthly"}><span>Monthly</span><strong>{MONTHLY.display} <small>/ month</small></strong></button>
+      <button type="button" className={plan === "annual" ? "active" : ""} onClick={() => setPlan("annual")} aria-pressed={plan === "annual"}><span>Annual · {ANNUAL_SAVINGS}</span><strong>{ANNUAL.display} <small>/ year</small></strong></button>
     </div>
     <p className="form-explainer">Membership begins today. After reserving your founder number, you’ll continue to Stripe’s secure checkout.</p>
     <div className="field-row"><label><span>First name</span><input name="firstName" autoComplete="given-name" required /></label><label><span>Email</span><input name="email" type="email" autoComplete="email" required /></label></div>
     <label><span>What would help most right now? <em>Optional</em></span><textarea name="challenge" rows={3} placeholder="A difficult message, parenting schedule, money, feeling less alone…" /></label>
-    <label className="newsletter-checkbox-label"><input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} /><span>Also subscribe me to <strong>The Sunday Reset</strong> — a free weekly note from Founding Dad #001.</span></label>
-    <button className="button button-primary submit-button" disabled={status === "loading"}>{status === "loading" ? "Opening secure checkout…" : `Continue with the ${plan === "annual" ? "$99 annual" : "$9.99 monthly"} plan`}</button>
+    <label className="newsletter-checkbox-label"><input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} /><span>Also subscribe me to <strong>The Sunday Reset</strong> — a free weekly note from Bill.</span></label>
+    <button className="button button-primary submit-button" disabled={status === "loading"}>{status === "loading" ? "Opening secure checkout…" : `Continue with the ${selected.display} ${plan} plan`}</button>
     <p className="privacy-note">Payments are securely processed by Stripe. Cancel anytime. We never sell your information.</p>
     {status === "checkout-error" && <p className="form-error" role="alert">{result.message} You have not been charged.</p>}
   </form>;
