@@ -2,15 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { HOLDING_UP, type HoldingUp } from "@/content/check-in";
 
 type Props = {
-  initial: { holding_up: string; hardest: string; next_right: string };
+  initial: { holding_up: HoldingUp | null; hardest: string; next_right: string };
   editing: boolean;
 };
 
 export default function CheckInForm({ initial, editing }: Props) {
   const router = useRouter();
-  const [values, setValues] = useState(initial);
+  const [holdingUp, setHoldingUp] = useState<HoldingUp | null>(initial.holding_up);
+  const [values, setValues] = useState({
+    hardest: initial.hardest,
+    next_right: initial.next_right,
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,8 +25,8 @@ export default function CheckInForm({ initial, editing }: Props) {
   }
 
   async function submit() {
-    if (!values.holding_up.trim() && !values.hardest.trim() && !values.next_right.trim()) {
-      setError("Write something in at least one box, even a few words.");
+    if (!holdingUp) {
+      setError("Pick where the week landed. The rest is optional.");
       return;
     }
     setSaving(true);
@@ -30,13 +35,13 @@ export default function CheckInForm({ initial, editing }: Props) {
       const response = await fetch("/api/check-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ holding_up: holdingUp, ...values }),
       });
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { message?: string };
         throw new Error(body.message || "That did not save. Try again.");
       }
-      router.replace("/member");
+      router.replace("/member?checked-in=1");
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "That did not save. Try again.");
@@ -46,14 +51,25 @@ export default function CheckInForm({ initial, editing }: Props) {
 
   return (
     <div className="checkin-form">
-      <label className="checkin-field">
-        <span>How are you holding up?</span>
-        <textarea
-          rows={3}
-          value={values.holding_up}
-          onChange={(event) => set("holding_up", event.target.value)}
-        />
-      </label>
+      <fieldset className="checkin-scale">
+        <legend>How are you holding up?</legend>
+        <div className="checkin-scale-options">
+          {HOLDING_UP.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className={`checkin-scale-option${holdingUp === option.value ? " selected" : ""}`}
+              aria-pressed={holdingUp === option.value}
+              onClick={() => {
+                setHoldingUp(option.value);
+                if (error) setError("");
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </fieldset>
 
       <label className="checkin-field">
         <span>What was hardest this week?</span>
