@@ -21,5 +21,7 @@ export async function GET(request: Request) {
     console.error("Founder link failed after sign-in", linkError);
   }
 
-  return NextResponse.redirect(`${origin}/welcome/charter`);
+  // /member routes onward from here: profile if it is missing, and the
+  // charter when a paid surface is actually requested.
+  return NextResponse.redirect(`${origin}/member`);
 }

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "node:crypto";
 import { getPriceId, getStripe } from "@/lib/stripe";
-import { getFounderForCheckout, updateFounder } from "@/lib/supabase-admin";
+import { claimFounderForUser, getFounderForCheckout, updateFounder } from "@/lib/supabase-admin";
+import { createClient } from "@/lib/supabase/server";
 
 type CheckoutPayload = { plan?: "monthly" | "annual"; email?: string; founderNumber?: number; referralCode?: string };
 
@@ -46,6 +47,20 @@ export async function POST(request: Request) {
     });
 
     await updateFounder(founderNumber, { status: "checkout_pending" });
+
+    // Upgrading from a free account. The database trigger links by email,
+    // which cannot help a man who signed up with one address and pays with
+    // another. If he has a session, that session decides who gets access.
+    try {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) await claimFounderForUser(founderNumber, user.id);
+    } catch (claimError) {
+      // Checkout still proceeds. The email trigger is the fallback.
+      console.error("Could not attach checkout to the signed-in account", claimError);
+    }
     return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error("Stripe Checkout session creation failed", error);
