@@ -236,9 +236,16 @@ export default async function MemberHome({
             <p className="member-tile-hint">
               {paid && member.founderNumber ? "Permanent. Yours as long as you stay." : ""}
             </p>
-            <Link className="member-tile-link" href="/peace-monitor">
-              Open the Peace Monitor
-            </Link>
+            <div className="member-actions">
+              {paid ? (
+                <Link className="member-tile-link" href="/member/passages">
+                  Mark what you have been through
+                </Link>
+              ) : null}
+              <Link className="member-tile-link" href="/peace-monitor">
+                Open the Peace Monitor
+              </Link>
+            </div>
           </section>
         </div>
 
