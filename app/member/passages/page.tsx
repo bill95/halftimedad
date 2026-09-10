@@ -34,7 +34,7 @@ export default async function PassagesPage() {
 
   return (
     <>
-      <MemberHeader founderNumber={member.founderNumber} />
+      <MemberHeader founderNumber={member.founderNumber} tier={member.tier} />
       <main className="section-shell member-home">
         <div className="member-masthead">
           <span>What you have been through</span>
