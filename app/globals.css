@@ -152,3 +152,5 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
 .passage-state { flex: 0 0 auto; font-family: "Courier New", Courier, monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: #7b8a80; }
 .passage.claimed .passage-state { color: #153c2f; }
 .passage-note { color: #7b8a80; font-size: 0.85rem; }
+
+.profile-option.selected { border-color: #153c2f; background: #eef1e6; }

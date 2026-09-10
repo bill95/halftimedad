@@ -163,7 +163,7 @@ export default async function MemberHome({
             ))}
           </ol>
           <p className="member-play-note">{play.note}</p>
-          <Link className="member-tile-link" href="/welcome/profile">
+          <Link className="member-tile-link" href="/welcome/profile?only=focus_now">
             Change your focus
           </Link>
         </section>

@@ -149,3 +149,39 @@ export async function linkFounderUser(email: string, userId: string) {
   });
   if (!profile.ok) throw new Error(`Supabase profile create failed (${profile.status})`);
 }
+
+/**
+ * Profile writes run as the service role.
+ *
+ * Members no longer hold INSERT or UPDATE on member_profiles beyond the
+ * Sunday-email preference, because charter_accepted_at sitting behind a
+ * member's own key made the charter record self-attestable. These helpers are
+ * the only path in, and they patch rather than replace: the old route nulled
+ * every column it was not given, so changing one answer wiped the other three.
+ */
+export async function patchProfile(userId: string, patch: Record<string, unknown>) {
+  const { base, headers } = config();
+
+  const existing = await fetch(
+    `${base}/rest/v1/member_profiles?user_id=eq.${userId}&select=user_id`,
+    { headers, cache: "no-store" }
+  );
+  if (!existing.ok) throw new Error(`Supabase profile lookup failed (${existing.status})`);
+  const rows = (await existing.json()) as unknown[];
+
+  const response = rows.length
+    ? await fetch(`${base}/rest/v1/member_profiles?user_id=eq.${userId}`, {
+        method: "PATCH",
+        headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify(patch),
+        cache: "no-store",
+      })
+    : await fetch(`${base}/rest/v1/member_profiles`, {
+        method: "POST",
+        headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ user_id: userId, ...patch }),
+        cache: "no-store",
+      });
+
+  if (!response.ok) throw new Error(`Supabase profile write failed (${response.status}): ${await response.text()}`);
+}

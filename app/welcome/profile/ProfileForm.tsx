@@ -28,29 +28,41 @@ const STEPS = [
   { key: "focus_now" as const, question: "What matters most right now?", options: FOCUS_AREAS },
 ];
 
-export default function ProfileForm() {
+type Props = {
+  /** What is already on file. The wizard used to start from blank even when
+   *  editing, so pulling the one lever a member has meant answering all four
+   *  questions again and overwriting three good answers to change one. */
+  initial: Answers;
+  /** Single-question mode, used by "change your focus" on the member home. */
+  only?: keyof Answers;
+};
+
+export default function ProfileForm({ initial, only }: Props) {
   const router = useRouter();
+  const steps = only ? STEPS.filter((step) => step.key === only) : STEPS;
+
   const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Answers>({
-    stage: null,
-    custody: null,
-    conflict: null,
-    focus_now: null,
-  });
+  const [answers, setAnswers] = useState<Answers>(initial);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const current = STEPS[step];
-  const isLast = step === STEPS.length - 1;
+  const current = steps[step];
+  const isLast = step === steps.length - 1;
 
   async function save(final: Answers) {
     setSaving(true);
     setError("");
     try {
+      // Send only what this form is responsible for. The route patches now,
+      // so anything omitted is left alone rather than nulled.
+      const payload = only
+        ? { [only]: final[only] }
+        : Object.fromEntries(steps.map((s) => [s.key, final[s.key]]));
+
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(final),
+        body: JSON.stringify(payload),
       });
       if (!response.ok) {
         const body = (await response.json().catch(() => ({}))) as { message?: string };
@@ -76,11 +88,15 @@ export default function ProfileForm() {
     else setStep(step + 1);
   }
 
+  const currentValue = answers[current.key];
+
   return (
     <div className="profile-form">
-      <p className="profile-progress">
-        {step + 1} of {STEPS.length}
-      </p>
+      {steps.length > 1 ? (
+        <p className="profile-progress">
+          {step + 1} of {steps.length}
+        </p>
+      ) : null}
       <h2>{current.question}</h2>
 
       <div className="profile-options">
@@ -88,7 +104,8 @@ export default function ProfileForm() {
           <button
             key={option.value}
             type="button"
-            className="profile-option"
+            className={`profile-option${currentValue === option.value ? " selected" : ""}`}
+            aria-pressed={currentValue === option.value}
             onClick={() => choose(option.value)}
             disabled={saving}
           >
@@ -100,7 +117,13 @@ export default function ProfileForm() {
 
       <div className="profile-actions">
         <button type="button" className="profile-skip" onClick={skip} disabled={saving}>
-          {saving ? "Saving" : isLast ? "Finish without answering" : "Skip this one"}
+          {saving
+            ? "Saving"
+            : isLast
+              ? currentValue
+                ? "Leave it as it is"
+                : "Finish without answering"
+              : "Skip this one"}
         </button>
         {step > 0 && !saving ? (
           <button type="button" className="profile-skip" onClick={() => setStep(step - 1)}>

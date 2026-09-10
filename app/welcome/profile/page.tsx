@@ -8,8 +8,14 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ only?: string }>;
+}) {
   const member = await requireAccess();
+  const { only } = await searchParams;
+  const single = only === "focus_now" ? ("focus_now" as const) : undefined;
 
   return (
     <>
@@ -22,7 +28,15 @@ export default async function ProfilePage() {
           decides what you get sent and what shows up in the library. Skip anything you would rather
           not answer. You can change all of it later, and nobody else sees it.
         </p>
-        <ProfileForm />
+        <ProfileForm
+          only={single}
+          initial={{
+            stage: (member.profile?.stage as never) ?? null,
+            custody: (member.profile?.custody as never) ?? null,
+            conflict: (member.profile?.conflict as never) ?? null,
+            focus_now: (member.profile?.focus_now as never) ?? null,
+          }}
+        />
       </main>
       <SiteFooter />
     </>
