@@ -107,12 +107,27 @@ export async function getFounderByEmail(email: string) {
   return founder ?? null;
 }
 
+/** Force a founder row onto a specific auth user, whatever email it carries. */
+export async function claimFounderForUser(founderNumber: number, userId: string) {
+  const { base, headers } = config();
+  const response = await fetch(
+    `${base}/rest/v1/founding_members?founder_number=eq.${encodeURIComponent(String(founderNumber))}&user_id=is.null`,
+    {
+      method: "PATCH",
+      headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ user_id: userId }),
+      cache: "no-store",
+    }
+  );
+  if (!response.ok) throw new Error(`Supabase founder claim failed (${response.status})`);
+}
+
 /** Stamp the auth user onto the founder row and ensure a profile exists. */
 export async function linkFounderUser(email: string, userId: string) {
   const { base, headers } = config();
 
   const link = await fetch(
-    `${base}/rest/v1/founding_members?email=eq.${encodeURIComponent(email.trim().toLowerCase())}`,
+    `${base}/rest/v1/founding_members?email=eq.${encodeURIComponent(email.trim().toLowerCase())}&user_id=is.null`,
     {
       method: "PATCH",
       headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },

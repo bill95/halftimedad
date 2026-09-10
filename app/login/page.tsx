@@ -38,13 +38,13 @@ export default function LoginPage() {
             <div className="signup-card success-card">
               <p className="kicker">Check your email</p>
               <h3>The link is on its way.</h3>
-              <p>If that address is on the founding list, a sign-in link is in your inbox. It works once and expires in an hour.</p>
+              <p>Check that inbox. The link works once and expires in an hour. Whatever your Peace Monitor has been counting in this browser comes with you.</p>
             </div>
           ) : (
             <div className="signup-card">
-              <p className="kicker">Founding members</p>
+              <p className="kicker">Sign in or start free</p>
               <h2 style={{ fontSize: 42, margin: "0 0 14px" }}>Sign in</h2>
-              <p style={{ margin: "0 0 22px", color: "#c1cec5" }}>No password. Enter your email and we will send a link that signs you in.</p>
+              <p style={{ margin: "0 0 22px", color: "#c1cec5" }}>No password. Enter your email and we will send a link. New here, that link makes your free account, and it keeps your count from dying with this browser.</p>
               <label>
                 <span>Email</span>
                 <input type="email" autoComplete="email" value={email}
@@ -57,7 +57,7 @@ export default function LoginPage() {
                 className="button button-primary submit-button">
                 {busy ? "Sending" : "Send my sign-in link"}
               </button>
-              <p className="privacy-note" style={{ marginTop: 16 }}>Membership opens September 1.</p>
+              <p className="privacy-note" style={{ marginTop: 16 }}>Free gets you the Peace Monitor and one play a week. Membership opens the rest.</p>
             </div>
           )}
         </div>

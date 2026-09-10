@@ -1,10 +1,19 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getFounderByEmail } from "@/lib/supabase-admin";
 
-// Same response whether or not the email exists. Never confirm membership to a stranger.
+// Open to anyone now that free accounts exist. Before, this checked the
+// founding list first, which meant a man who wanted to save his Peace
+// Monitor count had nowhere to go.
+//
+// Membership is decided after sign-in, by lib/access.ts and by RLS. Holding
+// a session gets you the free half and nothing more.
+//
+// The old enumeration guard is gone with the gate it protected: everyone
+// gets the same answer because everyone gets the same link. Abuse control is
+// Supabase's OTP rate limit, which is worth a look in the dashboard before
+// this sees real traffic.
 const SAME_ANSWER = {
-  message: "If that email is on the founding list, a sign-in link is on its way.",
+  message: "A sign-in link is on its way.",
 };
 
 export async function POST(request: Request) {
@@ -13,11 +22,6 @@ export async function POST(request: Request) {
     const address = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!/^\S+@\S+\.\S+$/.test(address)) {
       return NextResponse.json({ message: "Enter a valid email address." }, { status: 400 });
-    }
-
-    const founder = await getFounderByEmail(address);
-    if (!founder || (founder.status !== "active" && founder.status !== "past_due")) {
-      return NextResponse.json(SAME_ANSWER);
     }
 
     const supabase = await createClient();

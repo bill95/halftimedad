@@ -1,7 +1,8 @@
 import SiteFooter from "@/components/SiteFooter";
 import MemberHeader from "@/components/MemberHeader";
 import { createClient } from "@/lib/supabase/server";
-import { requireMember, weekOf } from "@/lib/member";
+import { weekOf } from "@/lib/member";
+import { requirePaid } from "@/lib/access";
 import CheckInForm from "./CheckInForm";
 
 export const metadata = {
@@ -10,7 +11,7 @@ export const metadata = {
 };
 
 export default async function CheckInPage() {
-  const member = await requireMember("member");
+  const member = await requirePaid();
   const supabase = await createClient();
 
   const { data: existing } = await supabase
