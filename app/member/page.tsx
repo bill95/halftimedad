@@ -209,18 +209,19 @@ export default async function MemberHome() {
           <div className="member-card-head">
             <span>The library</span>
             <span className="member-pill">
-              {paid
-                ? daysToLibrary > 0
-                  ? `Opens in ${daysToLibrary} days`
-                  : "Open"
-                : "Members"}
+              {paid ? (daysToLibrary > 0 ? "Filling up" : "Open") : "Members"}
             </span>
           </div>
           <p className="member-card-body">
             {paid
-              ? "Built around where you actually are, not a list of everything. What you write in the check-ins between now and then decides what goes in it first."
+              ? "Sorted by where you said you are, not by what was published last. What you write in the check-ins decides what gets written next."
               : "Guides written for the situation you just described, not for everybody. It opens October 1."}
           </p>
+          {paid ? (
+            <Link className="button button-secondary" href="/member/library">
+              Open the library
+            </Link>
+          ) : null}
         </section>
       </main>
       <SiteFooter />
