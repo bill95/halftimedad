@@ -1,6 +1,6 @@
 import SiteFooter from "@/components/SiteFooter";
 import MemberHeader from "@/components/MemberHeader";
-import { requireMember } from "@/lib/member";
+import { requireAccess } from "@/lib/access";
 import ProfileForm from "./ProfileForm";
 
 export const metadata = {
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-  const member = await requireMember("profile");
+  const member = await requireAccess();
 
   return (
     <>

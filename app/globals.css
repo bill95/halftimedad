@@ -70,3 +70,13 @@
 .member-header-right { display: flex; align-items: center; gap: 1.25rem; }
 .member-header-number { font-family: "Courier New", Courier, monospace; font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: #5a6a60; }
 .member-header-signout { font-size: 0.9rem; color: #153c2f; text-decoration: underline; }
+
+/* ---------- This week's play ---------- */
+.member-play { border-color: rgba(21,60,47,0.35); }
+.member-play-read { margin: 0 0 0.6rem; color: #5a6a60; font-size: 0.95rem; line-height: 1.6; }
+.member-play-title { margin: 0 0 1rem; font-size: 1.5rem; line-height: 1.2; }
+.member-play-steps { margin: 0 0 1.1rem; padding-left: 1.1rem; }
+.member-play-steps li { margin-bottom: 0.7rem; line-height: 1.7; color: #334a40; }
+.member-play-steps li:last-child { margin-bottom: 0; }
+.member-play-note { margin: 0 0 0.5rem; padding-top: 0.9rem; border-top: 1px solid rgba(23,35,29,0.12); color: #5a6a60; font-size: 0.92rem; line-height: 1.7; }
+.member-locked { background: #f0ede4; border-style: dashed; }

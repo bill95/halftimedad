@@ -14,6 +14,30 @@ type DashboardState = {
 
 type ViewMode = "public" | "shared" | "own";
 
+type ServerState = {
+  streakStartedAt: number;
+  longestStreak: number;
+  lifetimeResets: number;
+  totalCleanDays: number;
+};
+
+/**
+ * Pushes the count to the account. Anonymous visitors never call this and
+ * keep working exactly as before, on localStorage alone.
+ */
+async function saveToServer(state: DashboardState) {
+  await fetch("/api/monitor", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      streakStartedAt: state.lastReset,
+      longestStreak: state.longestStreak,
+      lifetimeResets: state.lifetimeResets,
+      totalCleanDays: state.totalCompletedDays,
+    }),
+  });
+}
+
 const STORAGE_KEY = "halftimedad-dashboard-v1";
 const OWNER_KEY = "halftimedad-dashboard-owner-v1";
 const DAY = 86_400_000;
@@ -77,6 +101,7 @@ export default function Dashboard() {
   const [toast, setToast] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("public");
+  const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -106,6 +131,48 @@ export default function Dashboard() {
       setViewMode(mode);
       if (mode === "shared") setToast("Shared count loaded. Start your own below.");
     }, 0);
+
+    // If there is an account behind this browser, it wins, except when the
+    // account has no count yet. Then the browser's count is carried up.
+    // Losing a forty day streak by signing up would be the worst possible
+    // moment to ask a man for his email address.
+    void (async () => {
+      try {
+        const res = await fetch("/api/monitor");
+        if (!res.ok) return;
+        const data = (await res.json()) as { signedIn: boolean; state: ServerState | null };
+        if (!data.signedIn) return;
+        setSignedIn(true);
+
+        if (data.state) {
+          const fromServer: DashboardState = {
+            createdAt: initial.createdAt,
+            lastReset: data.state.streakStartedAt,
+            longestStreak: data.state.longestStreak,
+            lifetimeResets: data.state.lifetimeResets,
+            totalCompletedDays: data.state.totalCleanDays,
+            id: initial.id,
+          };
+          setState(fromServer);
+          setViewMode("own");
+          localStorage.setItem(STORAGE_KEY, encodeState(fromServer));
+          localStorage.setItem(OWNER_KEY, fromServer.id);
+          return;
+        }
+
+        const carried = stored ?? initial;
+        await saveToServer(carried);
+        setState(carried);
+        setViewMode("own");
+        localStorage.setItem(STORAGE_KEY, encodeState(carried));
+        localStorage.setItem(OWNER_KEY, carried.id);
+        const days = daysSince(carried.lastReset);
+        setToast(days > 0 ? `Your ${days} days came with you.` : "Saved to your account.");
+      } catch {
+        // Offline or signed out. localStorage already has it.
+      }
+    })();
+
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -140,6 +207,7 @@ export default function Dashboard() {
     localStorage.setItem(STORAGE_KEY, encoded);
     localStorage.setItem(OWNER_KEY, next.id);
     setViewMode("own");
+    if (signedIn) void saveToServer(next);
     if (updateUrl) history.replaceState(null, "", "#mine");
   }
 
@@ -205,7 +273,8 @@ export default function Dashboard() {
         </Link>
         <div className="nav-actions">
           <button className="ghost" onClick={() => setShowCreate(true)}>{viewMode === "own" ? "New dashboard" : "Create your monitor"}</button>
-          <button className="light" onClick={share}>Share</button>
+          {signedIn ? null : <a className="light" href="/login">Save my count</a>}
+          <button className="ghost" onClick={share}>Share</button>
         </div>
       </header>
 
@@ -228,7 +297,7 @@ export default function Dashboard() {
           <div><span>Last restart</span><strong>{currentDays === 0 ? "Today" : `${currentDays} day${currentDays === 1 ? "" : "s"} ago`}</strong></div>
           <div><span>What this counts</span><strong>Your side only</strong></div>
         </div>
-        <div className={`bookmark-note ${viewMode !== "own" ? "shared" : ""}`}>{viewMode !== "own" ? <><strong>Want to track your own streak?</strong><span>Create your own private monitor below. {viewMode === "public" ? "The public demo will stay unchanged." : "This shared dashboard will stay unchanged."}</span></> : <><strong>Keep your monitor handy.</strong><span>It is saved in this browser. Bookmark this page so it is easy to return.</span></>}</div>
+        <div className={`bookmark-note ${viewMode !== "own" ? "shared" : ""}`}>{viewMode !== "own" ? <><strong>Want to track your own streak?</strong><span>Create your own private monitor below. {viewMode === "public" ? "The public demo will stay unchanged." : "This shared dashboard will stay unchanged."}</span></> : (signedIn ? <><strong>Saved to your account.</strong><span>This count follows you to any device you sign in on.</span></> : <><strong>This count lives in this browser only.</strong><span>Clear your history or pick up your other phone and it is gone. A free account keeps it, and your days come with you.</span></>)}</div>
       </section>
 
       <section className="grid">
