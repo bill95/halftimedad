@@ -31,8 +31,14 @@ function greeting(now = new Date()) {
   return "Evening";
 }
 
-export default async function MemberHome() {
+export default async function MemberHome({
+  searchParams,
+}: {
+  searchParams: Promise<{ locked?: string; "checked-in"?: string }>;
+}) {
   const member = await requireAccess();
+  const params = await searchParams;
+  const justCheckedIn = params["checked-in"] === "1";
   const paid = member.tier === "paid";
 
   // The profile is the one thing both tiers must have. It is what makes the
@@ -46,7 +52,7 @@ export default async function MemberHome() {
   const week = weekOf();
   const play = selectPlay(member.profile, week);
 
-  const [{ data: thisWeek }, { data: badges }] = paid
+  const [{ data: thisWeek }, { data: badges }, { data: lastEntry }] = paid
     ? await Promise.all([
         supabase
           .from("check_ins")
@@ -59,8 +65,20 @@ export default async function MemberHome() {
           .select("badge_slug, earned_at, badges(label, description)")
           .eq("user_id", member.userId)
           .order("earned_at", { ascending: true }),
+        // What he said he would do, from the most recent week that is not
+        // this one. Three answers a week going into a void is the fastest
+        // way to stop answering.
+        supabase
+          .from("check_ins")
+          .select("week_of, next_right")
+          .eq("user_id", member.userId)
+          .lt("week_of", week)
+          .not("next_right", "is", null)
+          .order("week_of", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
       ])
-    : [{ data: null }, { data: null }];
+    : [{ data: null }, { data: null }, { data: null }];
 
   const done = Boolean(thisWeek);
   // badges(label) is a joined row; Supabase types it as object or array
@@ -103,11 +121,20 @@ export default async function MemberHome() {
         </h1>
         <p className="member-subhead">
           {paid
-            ? done
-              ? "You checked in this week. Nothing else is asked of you."
-              : "Nothing here is overdue. The check-in is open when you want it."
+            ? justCheckedIn
+              ? "Logged. It is in your record now, and it is what decides what gets written next."
+              : done
+                ? "You checked in this week. Nothing else is asked of you."
+                : "Nothing here is overdue. The check-in is open when you want it."
             : "One thing to work on this week, and the count. That is the free half."}
         </p>
+
+        {lastEntry?.next_right ? (
+          <section className="member-carry">
+            <p className="member-carry-label">Last time, the next right thing was</p>
+            <p className="member-carry-value">{lastEntry.next_right}</p>
+          </section>
+        ) : null}
 
         {/* The play. Computed from the profile, so it works before the
             library exists and it works for free accounts. */}
@@ -141,9 +168,14 @@ export default async function MemberHome() {
                   Same three questions next week. If something changed, you can edit this week&rsquo;s
                   answers.
                 </p>
-                <Link className="button button-secondary" href="/member/check-in">
-                  Edit this week
-                </Link>
+                <div className="member-actions">
+                  <Link className="button button-secondary" href="/member/check-in">
+                    Edit this week
+                  </Link>
+                  <Link className="member-tile-link" href="/member/record">
+                    Read your record
+                  </Link>
+                </div>
               </>
             ) : (
               <>
@@ -152,9 +184,14 @@ export default async function MemberHome() {
                   <li>What was hardest this week?</li>
                   <li>What&rsquo;s the next right thing?</li>
                 </ul>
-                <Link className="button button-primary" href="/member/check-in">
-                  Start this week&rsquo;s check-in
-                </Link>
+                <div className="member-actions">
+                  <Link className="button button-primary" href="/member/check-in">
+                    Start this week&rsquo;s check-in
+                  </Link>
+                  <Link className="member-tile-link" href="/member/record">
+                    Read your record
+                  </Link>
+                </div>
               </>
             )}
           </section>

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { weekOf } from "@/lib/member";
 import { requirePaid } from "@/lib/access";
 import CheckInForm from "./CheckInForm";
+import type { HoldingUp } from "@/content/check-in";
 
 export const metadata = {
   title: "The check-in | HalfTimeDad",
@@ -33,7 +34,7 @@ export default async function CheckInPage() {
         <CheckInForm
           editing={Boolean(existing)}
           initial={{
-            holding_up: existing?.holding_up ?? "",
+            holding_up: (existing?.holding_up as HoldingUp | undefined) ?? null,
             hardest: existing?.hardest ?? "",
             next_right: existing?.next_right ?? "",
           }}
