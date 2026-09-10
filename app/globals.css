@@ -126,3 +126,15 @@
 .record-line { margin: 0 0 0.7rem; line-height: 1.7; color: #263a31; }
 .record-line span { display: block; font-family: "Courier New", Courier, monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #7b8a80; margin-bottom: 0.2rem; }
 .record-line:last-child { margin-bottom: 0; }
+
+/* ---------- Shell: sign-in, member nav, notices ---------- */
+.site-header-actions { margin-left: auto; display: flex; align-items: center; gap: 1.1rem; }
+.site-header nav { margin-left: auto; }
+.site-header-actions + nav { margin-left: 0; }
+.site-header-signin { color: #153c2f; font-size: 14px; font-weight: 750; text-decoration: none; }
+.site-header-signin:hover { text-decoration: underline; }
+.member-header-right { display: flex; align-items: center; gap: 1.1rem; }
+button.member-header-signout { border: 0; padding: 0; background: none; font: inherit; font-size: 0.9rem; color: #153c2f; text-decoration: underline; cursor: pointer; }
+.member-notice { margin: 0 0 1.6rem; padding: 0.9rem 1.1rem; border: 1px dashed rgba(23,35,29,0.28); border-radius: 10px; background: #f0ede4; }
+.member-notice p { margin: 0; line-height: 1.65; color: #334a40; }
+@media (max-width: 940px) { .site-header nav { display: none; } .site-header-actions { margin-left: auto; } }

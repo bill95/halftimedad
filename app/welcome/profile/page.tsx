@@ -13,7 +13,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <MemberHeader />
+      <MemberHeader tier={member.tier} />
       <main className="section-shell charter-page">
         <p className="kicker">Four questions</p>
         <h1>Where you are</h1>

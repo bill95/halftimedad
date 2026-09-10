@@ -24,7 +24,7 @@ export default async function CheckInPage() {
 
   return (
     <>
-      <MemberHeader />
+      <MemberHeader tier={member.tier} />
       <main className="section-shell charter-page">
         <p className="kicker">{existing ? "Editing this week" : "This week"}</p>
         <h1>The check-in</h1>

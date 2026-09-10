@@ -1,13 +1,23 @@
 import Link from "next/link";
+import SignOutButton from "@/components/SignOutButton";
 
 /**
  * Header for pages behind the door.
  *
  * The marketing header sells the membership. Showing "Join the village" to a
- * man who already joined reads as though the site does not know him, so member
- * pages get the brand mark and a way out, nothing else.
+ * man who already joined reads as though the site does not know him.
+ *
+ * There are five surfaces back here now and they used to be reachable only
+ * from cards on the member home, which meant every page but that one was a
+ * dead end. Free accounts see only what they have.
  */
-export default function MemberHeader({ founderNumber }: { founderNumber?: number | null }) {
+export default function MemberHeader({
+  founderNumber,
+  tier = "paid",
+}: {
+  founderNumber?: number | null;
+  tier?: "free" | "paid";
+}) {
   return (
     <header className="site-header">
       <div className="site-header-inner">
@@ -18,15 +28,27 @@ export default function MemberHeader({ founderNumber }: { founderNumber?: number
           </span>
           <span>HalfTimeDad</span>
         </Link>
+        <nav aria-label="Member navigation">
+          {tier === "paid" ? (
+            <>
+              <Link href="/member/check-in">Check-in</Link>
+              <Link href="/member/library">Library</Link>
+              <Link href="/member/record">Record</Link>
+              <Link href="/member/passages">Passages</Link>
+            </>
+          ) : null}
+          <Link href="/peace-monitor">Monitor</Link>
+        </nav>
         <div className="member-header-right">
           {founderNumber ? (
             <span className="member-header-number">
               Founder #{String(founderNumber).padStart(3, "0")}
             </span>
           ) : null}
-          <Link className="member-header-signout" href="/auth/sign-out">
-            Sign out
+          <Link className="member-header-signout" href="/member/settings">
+            Settings
           </Link>
+          <SignOutButton />
         </div>
       </div>
     </header>

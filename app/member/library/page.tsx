@@ -34,7 +34,7 @@ export default async function LibraryPage() {
 
   return (
     <>
-      <MemberHeader founderNumber={member.founderNumber} />
+      <MemberHeader founderNumber={member.founderNumber} tier={member.tier} />
       <main className="section-shell member-home">
         <div className="member-masthead">
           <span>The library</span>
