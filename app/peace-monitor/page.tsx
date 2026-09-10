@@ -1,1 +1,1 @@
-import type{Metadata}from"next";import Dashboard from"@/components/Dashboard";export const metadata:Metadata={title:"Domestic Peace Monitor",description:"A private, lighthearted dashboard for tracking the calm—one day at a time."};export default function Page(){return <Dashboard/>}
+import type{Metadata}from"next";import Dashboard from"@/components/Dashboard";export const metadata:Metadata={title:"The Peace Monitor",description:"A private, lighthearted count of the days you kept it clean. One day at a time."};export default function Page(){return <Dashboard/>}

@@ -64,12 +64,12 @@ function daysSince(timestamp: number) {
   return Math.max(0, Math.floor((Date.now() - timestamp) / DAY));
 }
 
-function threat(days: number) {
-  if (days >= 90) return { label: "Extremely Low", icon: "🟢", outlook: "Suspiciously peaceful" };
-  if (days >= 30) return { label: "Low", icon: "🟢", outlook: "Unprecedented calm" };
-  if (days >= 7) return { label: "Guarded", icon: "🟡", outlook: "Cautiously optimistic" };
-  if (days >= 2) return { label: "Elevated", icon: "🟠", outlook: "Enjoy it while it lasts" };
-  return { label: "Severe", icon: "🔴", outlook: "Active recovery period" };
+function standing(days: number) {
+  if (days >= 90) return { label: "Locked in", icon: "🟢", outlook: "This is just how you operate now" };
+  if (days >= 30) return { label: "Steady", icon: "🟢", outlook: "A month of not taking the bait" };
+  if (days >= 7) return { label: "Holding", icon: "🟡", outlook: "Week two is the hard one" };
+  if (days >= 2) return { label: "Rebuilding", icon: "🟠", outlook: "Back on the board" };
+  return { label: "Day one", icon: "🔵", outlook: "Everybody starts here. Repeatedly." };
 }
 
 export default function Dashboard() {
@@ -104,7 +104,7 @@ export default function Dashboard() {
     const timer = window.setTimeout(() => {
       setState(initial);
       setViewMode(mode);
-      if (mode === "shared") setToast("Shared dashboard loaded — start your own to track your streak");
+      if (mode === "shared") setToast("Shared count loaded. Start your own below.");
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
@@ -116,7 +116,7 @@ export default function Dashboard() {
   }, [toast]);
 
   const currentDays = state ? daysSince(state.lastReset) : 0;
-  const status = threat(currentDays);
+  const status = standing(currentDays);
   const longest = state ? Math.max(state.longestStreak, currentDays) : 0;
   const average = state?.lifetimeResets
     ? (state.totalCompletedDays / state.lifetimeResets).toFixed(1)
@@ -125,11 +125,11 @@ export default function Dashboard() {
 
   const quote = useMemo(() => {
     const quotes = [
-      "No news is good news.",
-      "Stay humble. Stay off Reply All.",
-      "Remember: screenshots last forever.",
-      "May your texts be brief and your weekends remain unchanged.",
-      "Things are quiet. Do not do anything stupid.",
+      "You do not have to answer tonight.",
+      "Write it. Do not send it. Read it in the morning.",
+      "Screenshots last forever. So does the record you are building.",
+      "Nobody has ever regretted the message he did not send.",
+      "Short, boring, and sent before noon.",
     ];
     return quotes[new Date().getDate() % quotes.length];
   }, []);
@@ -150,7 +150,7 @@ export default function Dashboard() {
       return;
     }
     const ok = window.confirm(
-      "Confirm new incident?\n\nThis resets the counter and enters the event into the completely unofficial permanent record."
+      "Reset the count?\n\nYou sent it, you said it, or you took the bait. Log it and start over. Nobody sees this but you."
     );
     if (!ok) return;
     const completed = daysSince(state.lastReset);
@@ -164,7 +164,7 @@ export default function Dashboard() {
       },
       true
     );
-    setToast("Incident recorded. Recovery clock restarted.");
+    setToast("Logged. Day one again. That is the whole game.");
   }
 
   async function share() {
@@ -172,8 +172,8 @@ export default function Dashboard() {
     const encoded = encodeState({ ...state, longestStreak: longest });
     const url = `${window.location.origin}${window.location.pathname}#d=${encoded}`;
     const data = {
-      title: "Domestic Peace Monitor",
-      text: `${currentDays} days incident free. Threat level: ${status.label}.`,
+      title: "The Peace Monitor",
+      text: `${currentDays} days without sending the message I would regret.`,
       url,
     };
     try {
@@ -191,7 +191,7 @@ export default function Dashboard() {
     const next = freshState();
     persist(next, true);
     setShowCreate(false);
-    setToast("Your Peace Monitor is ready — bookmark this page");
+    setToast("Your Peace Monitor is ready. Bookmark this page.");
   }
 
   if (!state) return <main className="monitor-loading">Calibrating domestic stability...</main>;
@@ -211,44 +211,44 @@ export default function Dashboard() {
 
       <section className="hero card">
         <div className="hero-copy">
-          <p className="eyebrow">Domestic Peace Monitor™</p>
-          <h1>Track the calm.<br />One day at a time.</h1>
-          <p className="lede">A completely unofficial incident dashboard built on hope, selective memory, and no reliable scientific evidence.</p>
+          <p className="eyebrow">The Peace Monitor</p>
+          <h1>Count the days<br />you kept it clean.</h1>
+          <p className="lede">A completely unofficial count of the times you did not send it, built on restraint, selective memory, and no reliable scientific evidence.</p>
           <div className="identity">{viewMode === "public" ? "PUBLIC DEMO" : viewMode === "shared" ? "SHARED DASHBOARD" : "YOUR DASHBOARD"} · {state.id}</div>
         </div>
         <div className="counter-wrap">
           <div className="counter">
             <div className="number">{currentDays}</div>
-            <div className="counter-label">Days incident free</div>
+            <div className="counter-label">Days you kept it clean</div>
           </div>
         </div>
         <div className="status-grid">
-          <div><span>Threat level</span><strong>{status.icon} {status.label}</strong></div>
-          <div><span>Current outlook</span><strong>{status.outlook}</strong></div>
-          <div><span>Last incident</span><strong>{currentDays === 0 ? "Today" : `${currentDays} day${currentDays === 1 ? "" : "s"} ago`}</strong></div>
-          <div><span>System status</span><strong>Monitoring texts</strong></div>
+          <div><span>Your standing</span><strong>{status.icon} {status.label}</strong></div>
+          <div><span>The read</span><strong>{status.outlook}</strong></div>
+          <div><span>Last restart</span><strong>{currentDays === 0 ? "Today" : `${currentDays} day${currentDays === 1 ? "" : "s"} ago`}</strong></div>
+          <div><span>What this counts</span><strong>Your side only</strong></div>
         </div>
         <div className={`bookmark-note ${viewMode !== "own" ? "shared" : ""}`}>{viewMode !== "own" ? <><strong>Want to track your own streak?</strong><span>Create your own private monitor below. {viewMode === "public" ? "The public demo will stay unchanged." : "This shared dashboard will stay unchanged."}</span></> : <><strong>Keep your monitor handy.</strong><span>It is saved in this browser. Bookmark this page so it is easy to return.</span></>}</div>
       </section>
 
       <section className="grid">
         <article className="card panel wide">
-          <div className="panel-head"><div><p className="eyebrow">Performance metrics</p><h2>The official unofficial record</h2></div></div>
+          <div className="panel-head"><div><p className="eyebrow">Performance metrics</p><h2>Your unofficial record</h2></div></div>
           <div className="metrics">
             <div className="metric"><strong>{currentDays}</strong><span>Current streak</span></div>
             <div className="metric"><strong>{longest}</strong><span>Longest streak</span></div>
-            <div className="metric"><strong>{state.lifetimeResets}</strong><span>Lifetime incidents</span></div>
-            <div className="metric"><strong>{average}</strong><span>Average peaceful days</span></div>
+            <div className="metric"><strong>{state.lifetimeResets}</strong><span>Times restarted</span></div>
+            <div className="metric"><strong>{average}</strong><span>Average run</span></div>
           </div>
-          <button className={viewMode !== "own" ? "light own-monitor" : "danger"} onClick={reset}>{viewMode !== "own" ? "Create your own Peace Monitor" : "🚨 Record new incident"}</button>
+          <button className={viewMode !== "own" ? "light own-monitor" : "danger"} onClick={reset}>{viewMode !== "own" ? "Create your own Peace Monitor" : "I sent it. Reset the count."}</button>
           <p className="fine">Last reset: {new Date(state.lastReset).toLocaleString()}</p>
         </article>
 
         <article className="card panel">
-          <p className="eyebrow">Incident prediction</p>
-          <h2>{probability}% chance of unnecessary communication</h2>
+          <p className="eyebrow">Today&rsquo;s odds</p>
+          <h2>{probability}% chance you type something tonight you would take back</h2>
           <div className="meter"><span style={{ width: `${probability}%` }} /></div>
-          <p className="fine">Calculated using absolutely no reliable data and at least one bad assumption.</p>
+          <p className="fine">Calculated using absolutely no reliable data and at least one bad assumption about you.</p>
           <blockquote>“{quote}”</blockquote>
         </article>
 
@@ -256,31 +256,31 @@ export default function Dashboard() {
           <p className="eyebrow">Achievement cabinet</p>
           <div className="badges">
             {[
-              [7, "🥉", "Enjoying the Silence"],
-              [30, "🥈", "Unprecedented"],
-              [90, "🥇", "Historical Record"],
-              [365, "💎", "Scientific Anomaly"],
+              [7, "🥉", "One clean week"],
+              [30, "🥈", "Thirty days of it"],
+              [90, "🥇", "A full quarter"],
+              [365, "💎", "A year of restraint"],
             ].map(([days, emoji, title]) => (
               <div className={`badge ${currentDays >= Number(days) ? "unlocked" : ""}`} key={String(days)}>
-                <span>{emoji}</span><div><strong>{days} days · {title}</strong><small>{currentDays >= Number(days) ? "Unlocked" : "Keep the peace"}</small></div>
+                <span>{emoji}</span><div><strong>{days} days · {title}</strong><small>{currentDays >= Number(days) ? "Unlocked" : "Keep going"}</small></div>
               </div>
             ))}
           </div>
         </article>
 
         <article className="card panel wide">
-          <p className="eyebrow">Incident classification</p>
+          <p className="eyebrow">What resets the count</p>
           <div className="levels">
-            <div><span>🟢 Level 1</span><p>Minor complaint. A thumbs-up reaction may be sufficient.</p></div>
-            <div><span>🟡 Level 2</span><p>Multi-paragraph text. Read twice before replying once.</p></div>
-            <div><span>🟠 Level 3</span><p>Message begins with “We need to discuss...”</p></div>
-            <div><span>🔴 Level 4</span><p>Multiple texts received within ten minutes.</p></div>
-            <div><span>☢️ Level 5</span><p>Lawyer copied. Counter resets automatically in spirit.</p></div>
+            <div><span>🟢 Level 0</span><p>You typed the reply and deleted it. Counter holds. That one is a win.</p></div>
+            <div><span>🟡 Level 1</span><p>You sent the paragraph. You know the one.</p></div>
+            <div><span>🟠 Level 2</span><p>You said something in front of the kids you would not say in front of a judge.</p></div>
+            <div><span>🔴 Level 3</span><p>You replied five times in ten minutes.</p></div>
+            <div><span>☢️ Level 4</span><p>You put it on the internet.</p></div>
           </div>
         </article>
       </section>
 
-      <footer>Built for dads navigating the second half. A lighthearted reflection tool—not a clinical assessment or professional advice.</footer>
+      <footer>Built for dads navigating the second half. It counts your side of it and nothing else. A lighthearted self-tracking tool, not a clinical assessment or professional advice.</footer>
 
       {showCreate && (
         <div className="modal-backdrop" onClick={() => setShowCreate(false)}>
