@@ -28,7 +28,9 @@ export default function MemberHeader({
           </span>
           <span>HalfTimeDad</span>
         </Link>
-        <nav aria-label="Member navigation">
+        {/* Deliberately not .site-header nav: that element is hidden below
+            940px, which left members with no navigation at all on a phone. */}
+        <nav className="member-nav" aria-label="Member navigation">
           {tier === "paid" ? (
             <>
               <Link href="/member/check-in">Check-in</Link>
