@@ -294,3 +294,65 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
   .play-panel { padding: 1.8rem 1.5rem 1.6rem; border-radius: 14px; }
   .rail-figure { padding-top: 0.5rem; }
 }
+
+/* ================= Mobile navigation and focus =================
+   The header nav was hidden below 940px. That was written when it held four
+   marketing anchors; once member navigation moved into the same element it
+   meant a signed-in man on a phone saw the logo and nothing else. The member
+   nav is its own element now and never hides: below 940px it drops to its own
+   row and scrolls horizontally rather than disappearing. */
+
+.member-nav { margin-left: auto; display: flex; gap: 27px; }
+.member-nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--muted); font-size: 14px; font-weight: 750; text-decoration: none; white-space: nowrap; }
+.member-nav a:hover { color: var(--forest); }
+
+@media (max-width: 940px) {
+  .site-header-inner { flex-wrap: wrap; gap: 14px 18px; padding-block: 10px; }
+  .member-nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    gap: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+  }
+  .member-nav::-webkit-scrollbar { display: none; }
+  .member-header-right { margin-left: auto; gap: 14px; }
+}
+
+/* The only header action on a phone was nothing at all: .button-small was
+   hidden below 680px, which is the primary call to action. */
+@media (max-width: 680px) {
+  .site-header .button-small { display: inline-flex; min-height: 44px; padding: 0 16px; }
+  .site-header-signin { min-height: 44px; display: inline-flex; align-items: center; }
+}
+
+/* There were two :focus rules in the whole stylesheet, both on the signup
+   inputs. Everything else was invisible to a keyboard. */
+:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.monitor-shell :focus-visible,
+.play-panel :focus-visible,
+.first-run :focus-visible { outline-color: var(--lime); }
+
+/* Standalone controls need a real target. WCAG 2.2 allows 24px and gives an
+   inline exception for links inside sentences; these are not in sentences. */
+.rail-figure a, .rail-item a, .play-panel > a, .first-run-close, .member-tile-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.rail-item a, .rail-figure a { margin-top: -4px; }
+
+.member-header-signout, button.member-header-signout {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.member-header-number { white-space: nowrap; }
+@media (max-width: 680px) { .member-header-number { display: none; } }
