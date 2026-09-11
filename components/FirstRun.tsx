@@ -35,9 +35,9 @@ export default function FirstRun({ tier }: { tier: "free" | "paid" }) {
 
   return (
     <section className="first-run">
-      <div className="member-card-head">
-        <span>New here</span>
-        <button type="button" className="first-run-close" onClick={close} aria-label="Dismiss">
+      <div className="first-run-top">
+        <p className="first-run-lede-head">New here</p>
+        <button type="button" className="first-run-close" onClick={close}>
           Got it
         </button>
       </div>
