@@ -21,7 +21,7 @@ export default async function AssetPage({ params }: { params: Promise<{ slug: st
 
   return (
     <>
-      <MemberHeader founderNumber={member.founderNumber} />
+      <MemberHeader founderNumber={member.founderNumber} tier={member.tier} />
       <main className="section-shell charter-page">
         <Link className="member-tile-link" href="/member/library">
           Back to the library

@@ -126,3 +126,31 @@
 .record-line { margin: 0 0 0.7rem; line-height: 1.7; color: #263a31; }
 .record-line span { display: block; font-family: "Courier New", Courier, monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #7b8a80; margin-bottom: 0.2rem; }
 .record-line:last-child { margin-bottom: 0; }
+
+/* ---------- Shell: sign-in, member nav, notices ---------- */
+.site-header-actions { margin-left: auto; display: flex; align-items: center; gap: 1.1rem; }
+.site-header nav { margin-left: auto; }
+.site-header-actions + nav { margin-left: 0; }
+.site-header-signin { color: #153c2f; font-size: 14px; font-weight: 750; text-decoration: none; }
+.site-header-signin:hover { text-decoration: underline; }
+.member-header-right { display: flex; align-items: center; gap: 1.1rem; }
+button.member-header-signout { border: 0; padding: 0; background: none; font: inherit; font-size: 0.9rem; color: #153c2f; text-decoration: underline; cursor: pointer; }
+.member-notice { margin: 0 0 1.6rem; padding: 0.9rem 1.1rem; border: 1px dashed rgba(23,35,29,0.28); border-radius: 10px; background: #f0ede4; }
+.member-notice p { margin: 0; line-height: 1.65; color: #334a40; }
+@media (max-width: 940px) { .site-header nav { display: none; } .site-header-actions { margin-left: auto; } }
+/* ---------- Passage markers ---------- */
+.passage-list { list-style: none; margin: 0 0 1.2rem; padding: 0; }
+.passage { border-top: 1px solid rgba(23,35,29,0.12); }
+.passage:last-child { border-bottom: 1px solid rgba(23,35,29,0.12); }
+.passage button { display: flex; align-items: center; gap: 1rem; width: 100%; padding: 1.1rem 0.2rem; background: none; border: 0; font: inherit; text-align: left; cursor: pointer; }
+.passage button:disabled { opacity: 0.55; }
+.passage-mark { flex: 0 0 auto; width: 22px; height: 22px; border: 1px solid rgba(23,35,29,0.3); border-radius: 50%; }
+.passage.claimed .passage-mark { background: #153c2f; border-color: #153c2f; box-shadow: inset 0 0 0 3px #fbf8f0; }
+.passage-copy { flex: 1; }
+.passage-copy strong { display: block; font-size: 1.05rem; color: #14201b; }
+.passage-copy span { display: block; margin-top: 0.2rem; color: #5a6a60; font-size: 0.9rem; line-height: 1.6; }
+.passage-state { flex: 0 0 auto; font-family: "Courier New", Courier, monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: #7b8a80; }
+.passage.claimed .passage-state { color: #153c2f; }
+.passage-note { color: #7b8a80; font-size: 0.85rem; }
+
+.profile-option.selected { border-color: #153c2f; background: #eef1e6; }

@@ -39,6 +39,9 @@ export default async function MemberHome({
   const member = await requireAccess();
   const params = await searchParams;
   const justCheckedIn = params["checked-in"] === "1";
+  // Set when requirePaid() turns a free account away from a paid surface.
+  // Without a message this reads as a broken link rather than a paywall.
+  const cameFromLocked = params.locked === "1";
   const paid = member.tier === "paid";
 
   // The profile is the one thing both tiers must have. It is what makes the
@@ -104,7 +107,7 @@ export default async function MemberHome({
 
   return (
     <>
-      <MemberHeader founderNumber={member.founderNumber} />
+      <MemberHeader founderNumber={member.founderNumber} tier={member.tier} />
       <main className="section-shell member-home">
         <div className="member-masthead">
           <span>HalfTimeDad</span>
@@ -129,6 +132,15 @@ export default async function MemberHome({
             : "One thing to work on this week, and the count. That is the free half."}
         </p>
 
+        {cameFromLocked && !paid ? (
+          <section className="member-notice">
+            <p>
+              That part is for members. Your account, your count and this week&rsquo;s play stay
+              free either way.
+            </p>
+          </section>
+        ) : null}
+
         {lastEntry?.next_right ? (
           <section className="member-carry">
             <p className="member-carry-label">Last time, the next right thing was</p>
@@ -151,7 +163,7 @@ export default async function MemberHome({
             ))}
           </ol>
           <p className="member-play-note">{play.note}</p>
-          <Link className="member-tile-link" href="/welcome/profile">
+          <Link className="member-tile-link" href="/welcome/profile?only=focus_now">
             Change your focus
           </Link>
         </section>
@@ -236,9 +248,16 @@ export default async function MemberHome({
             <p className="member-tile-hint">
               {paid && member.founderNumber ? "Permanent. Yours as long as you stay." : ""}
             </p>
-            <Link className="member-tile-link" href="/peace-monitor">
-              Open the Peace Monitor
-            </Link>
+            <div className="member-actions">
+              {paid ? (
+                <Link className="member-tile-link" href="/member/passages">
+                  Mark what you have been through
+                </Link>
+              ) : null}
+              <Link className="member-tile-link" href="/peace-monitor">
+                Open the Peace Monitor
+              </Link>
+            </div>
           </section>
         </div>
 
