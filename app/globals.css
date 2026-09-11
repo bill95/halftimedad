@@ -155,16 +155,19 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
 
 .profile-option.selected { border-color: #153c2f; background: #eef1e6; }
 
-/* ---------- First run ---------- */
-.first-run { margin: 0 0 1.8rem; padding: 1.2rem 1.3rem; background: #153c2f; border-radius: 14px; color: #e8eee9; }
-.first-run .member-card-head { color: #a9bcb0; border-bottom-color: rgba(255,255,255,0.16); }
-.first-run .member-card-head span { color: #a9bcb0; }
-.first-run-close { border: 0; background: none; font: inherit; font-family: "Courier New", Courier, monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #e8eee9; text-decoration: underline; cursor: pointer; }
-.first-run-lede { margin: 0.9rem 0 0.8rem; line-height: 1.65; color: #e8eee9; }
+/* ---------- First run ----------
+   This was a second dark panel, which gave the page two loud things and left
+   the play no longer leading. Orientation should be quiet. */
+.first-run { margin: 0 0 1.8rem; padding: 1.1rem 0 1.3rem; border-top: 1px solid rgba(23,35,29,0.16); border-bottom: 1px solid rgba(23,35,29,0.16); }
+.first-run-top { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.first-run-lede-head { margin: 0; font-size: 0.95rem; font-weight: 700; color: #14201b; }
+.first-run-close { border: 0; padding: 0; background: none; font: inherit; font-size: 0.88rem; color: #5a6a60; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.first-run-close:hover { color: #153c2f; }
+.first-run-lede { margin: 0.5rem 0 0.7rem; line-height: 1.65; color: #5a6a60; }
 .first-run-list { margin: 0; padding-left: 1.1rem; }
-.first-run-list li { margin-bottom: 0.55rem; line-height: 1.65; color: #cbd8cf; }
+.first-run-list li { margin-bottom: 0.4rem; line-height: 1.65; color: #5a6a60; }
 .first-run-list li:last-child { margin-bottom: 0; }
-.first-run-list strong { color: #fbf8f0; }
+.first-run-list strong { color: #14201b; }
 
 /* ================= The room =================
    The member home used to be seven boxes with the same border, the same

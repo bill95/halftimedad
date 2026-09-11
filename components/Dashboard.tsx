@@ -262,16 +262,17 @@ export default function Dashboard() {
     setToast("Your Peace Monitor is ready. Bookmark this page.");
   }
 
-  if (!state) return <main className="monitor-loading">Calibrating domestic stability...</main>;
+  if (!state) return <main className="monitor-loading">Loading your count...</main>;
 
   return (
     <main className="monitor-shell">
       <header className="nav">
-        <Link className="logo" href="/" aria-label="HalfTimeDad home">
+        <Link className="logo" href={signedIn ? "/member" : "/"} aria-label="HalfTimeDad home">
           <span className="signal" />
           <span>HalfTimeDad</span>
         </Link>
         <div className="nav-actions">
+          {signedIn ? <Link className="light" href="/member">Back to your room</Link> : null}
           <button className="ghost" onClick={() => setShowCreate(true)}>{viewMode === "own" ? "New dashboard" : "Create your monitor"}</button>
           {signedIn ? null : <a className="light" href="/login">Save my count</a>}
           <button className="ghost" onClick={share}>Share</button>
