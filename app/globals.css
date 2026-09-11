@@ -165,3 +165,58 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
 .first-run-list li { margin-bottom: 0.55rem; line-height: 1.65; color: #cbd8cf; }
 .first-run-list li:last-child { margin-bottom: 0; }
 .first-run-list strong { color: #fbf8f0; }
+
+/* ================= The room =================
+   The member home used to be seven boxes with the same border, the same
+   radius and the same tracked-out label above each one, so nothing led and
+   the eye had nowhere to land. One element carries the page now: the play.
+   Everything in the rail is separated by hairlines instead of boxed, so it
+   reads as a record rather than a dashboard. */
+
+.room { width: min(1120px, calc(100% - 3rem)); margin: 0 auto; padding: 3rem 0 5rem; }
+.room-head { margin-bottom: 2.2rem; }
+.room-head h1 { margin: 0 0 0.4rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1.05; letter-spacing: -0.015em; color: #14201b; }
+.room-head p { margin: 0; font-size: 1.05rem; color: #5a6a60; }
+
+.room-grid { display: grid; grid-template-columns: 1.65fr 1fr; gap: 2.5rem; align-items: start; }
+
+/* The one loud thing. */
+.play-panel { padding: 2.4rem 2.4rem 2rem; border-radius: 18px; background: #153c2f; color: #e8eee9; }
+.play-panel-focus { margin: 0 0 1.6rem; font-size: 0.82rem; letter-spacing: 0.02em; color: #8fae9c; }
+.play-panel-read { margin: 0 0 0.5rem; font-size: 1.05rem; line-height: 1.6; color: #b9ccc0; }
+.play-panel h2 { margin: 0 0 1.6rem; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 3.4vw, 2.6rem); line-height: 1.12; letter-spacing: -0.015em; color: #fbf8f0; }
+.play-panel ol { margin: 0 0 1.6rem; padding-left: 1.3rem; }
+.play-panel li { margin-bottom: 0.95rem; font-size: 1.02rem; line-height: 1.65; color: #dce6df; }
+.play-panel li::marker { color: #8fae9c; }
+.play-panel li:last-child { margin-bottom: 0; }
+.play-panel-note { margin: 0 0 1.5rem; padding-top: 1.4rem; border-top: 1px solid rgba(232,238,233,0.18); font-size: 0.97rem; line-height: 1.7; color: #a9bcb0; }
+.play-panel > a { font-size: 0.92rem; color: #e8eee9; text-decoration: underline; text-underline-offset: 3px; }
+.play-panel > a:hover { color: #fff; }
+
+/* The rail is a record, not a stack of cards. */
+.room-rail { display: flex; flex-direction: column; }
+.rail-figure { padding-bottom: 1.5rem; border-bottom: 1px solid rgba(23,35,29,0.14); }
+.rail-figure-number { display: block; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.6rem, 7vw, 5rem); line-height: 0.95; letter-spacing: -0.03em; color: #153c2f; }
+.rail-figure-label { display: block; margin: 0.4rem 0 0.7rem; font-size: 0.98rem; color: #5a6a60; }
+.rail-figure-empty { padding-top: 0.2rem; }
+.rail-figure a, .rail-item a { font-size: 0.9rem; color: #153c2f; text-decoration: underline; text-underline-offset: 3px; }
+
+.rail-item { padding: 1.5rem 0; border-bottom: 1px solid rgba(23,35,29,0.14); }
+.rail-item:last-child { border-bottom: 0; }
+.rail-item h3 { margin: 0 0 0.5rem; font-size: 1.02rem; font-weight: 700; color: #14201b; }
+.rail-item p { margin: 0 0 0.7rem; font-size: 0.95rem; line-height: 1.65; color: #5a6a60; }
+.rail-item blockquote { margin: 0 0 0.8rem; padding-left: 0.9rem; border-left: 2px solid #b65032; font-family: Georgia, serif; font-size: 1.08rem; line-height: 1.5; color: #14201b; }
+.rail-read-title { color: #14201b !important; font-weight: 700; margin-bottom: 0.25rem !important; }
+.rail-counts p { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.35rem; color: #5a6a60; }
+.rail-counts span { font-family: Georgia, serif; font-size: 1.7rem; line-height: 1; color: #153c2f; }
+.rail-counts a { display: inline-block; margin-top: 0.6rem; }
+.rail-situation p { color: #14201b; }
+
+.room .first-run, .room .member-notice { margin-bottom: 2.2rem; }
+
+@media (max-width: 900px) {
+  .room { width: calc(100% - 2.4rem); padding: 2rem 0 3.5rem; }
+  .room-grid { grid-template-columns: 1fr; gap: 1.8rem; }
+  .play-panel { padding: 1.8rem 1.5rem 1.6rem; border-radius: 14px; }
+  .rail-figure { padding-top: 0.5rem; }
+}
