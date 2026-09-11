@@ -21,7 +21,7 @@ export default async function ProfilePage({
     <>
       <MemberHeader tier={member.tier} />
       <main className="section-shell charter-page">
-        <p className="kicker">Four questions</p>
+        <p className="kicker">{single ? "One question" : "Four questions, one that matters"}</p>
         <h1>Where you are</h1>
         <p className="charter-intro">
           {member.firstName ? `${member.firstName}, this ` : "This "}
