@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import MemberHeader from "@/components/MemberHeader";
+import FirstRun from "@/components/FirstRun";
 import { createClient } from "@/lib/supabase/server";
 import { requireAccess } from "@/lib/access";
 import { weekOf } from "@/lib/member";
@@ -131,6 +132,8 @@ export default async function MemberHome({
                 : "Nothing here is overdue. The check-in is open when you want it."
             : "One thing to work on this week, and the count. That is the free half."}
         </p>
+
+        <FirstRun tier={member.tier} />
 
         {cameFromLocked && !paid ? (
           <section className="member-notice">

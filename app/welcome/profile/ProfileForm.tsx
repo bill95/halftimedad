@@ -21,11 +21,19 @@ type Answers = {
   focus_now: FocusArea | null;
 };
 
+/**
+ * Focus comes first on purpose.
+ *
+ * It is the only answer that changes anything immediately: both this week's
+ * play and the ordering of the library key off it. Asking it fourth meant a
+ * man answered four questions before the product reacted to any of them. Now
+ * it reacts after one tap and the rest is refinement he can skip.
+ */
 const STEPS = [
+  { key: "focus_now" as const, question: "What matters most right now?", options: FOCUS_AREAS },
   { key: "stage" as const, question: "Where are you in this?", options: STAGES },
   { key: "custody" as const, question: "How is time with the kids split?", options: CUSTODY },
   { key: "conflict" as const, question: "How are things with their mother?", options: CONFLICT },
-  { key: "focus_now" as const, question: "What matters most right now?", options: FOCUS_AREAS },
 ];
 
 type Props = {
@@ -116,6 +124,11 @@ export default function ProfileForm({ initial, only }: Props) {
       </div>
 
       <div className="profile-actions">
+        {!only && step > 0 && answers.focus_now && !saving ? (
+          <button type="button" className="profile-skip" onClick={() => void save(answers)}>
+            Done for now
+          </button>
+        ) : null}
         <button type="button" className="profile-skip" onClick={skip} disabled={saving}>
           {saving
             ? "Saving"

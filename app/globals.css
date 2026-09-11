@@ -154,3 +154,14 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
 .passage-note { color: #7b8a80; font-size: 0.85rem; }
 
 .profile-option.selected { border-color: #153c2f; background: #eef1e6; }
+
+/* ---------- First run ---------- */
+.first-run { margin: 0 0 1.8rem; padding: 1.2rem 1.3rem; background: #153c2f; border-radius: 14px; color: #e8eee9; }
+.first-run .member-card-head { color: #a9bcb0; border-bottom-color: rgba(255,255,255,0.16); }
+.first-run .member-card-head span { color: #a9bcb0; }
+.first-run-close { border: 0; background: none; font: inherit; font-family: "Courier New", Courier, monospace; font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: #e8eee9; text-decoration: underline; cursor: pointer; }
+.first-run-lede { margin: 0.9rem 0 0.8rem; line-height: 1.65; color: #e8eee9; }
+.first-run-list { margin: 0; padding-left: 1.1rem; }
+.first-run-list li { margin-bottom: 0.55rem; line-height: 1.65; color: #cbd8cf; }
+.first-run-list li:last-child { margin-bottom: 0; }
+.first-run-list strong { color: #fbf8f0; }
