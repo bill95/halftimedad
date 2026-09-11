@@ -170,6 +170,77 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
 .first-run-list strong { color: #14201b; }
 
 /* ================= The room =================
+   Built against the marketing tokens rather than hex values typed by hand,
+   which is why this used to read as a different product once you signed in.
+   Lime on forest is the brand's signature pairing (it is how the founder card,
+   the belief band and the tool cards all work), and the member area was not
+   using it anywhere. Display type matches the marketing scale: tight tracking,
+   sub-1 line height. */
+
+.room { width: min(1180px, calc(100% - 48px)); margin: 0 auto; padding: 58px 0 96px; }
+.room-head { margin-bottom: 42px; }
+.room-head h1 { margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-weight: 500; font-size: clamp(46px, 6vw, 78px); line-height: .96; letter-spacing: -.055em; color: var(--ink); }
+.room-head p { margin: 0; color: var(--muted); font-size: 19px; line-height: 1.55; }
+
+.room-grid { display: grid; grid-template-columns: 1.6fr .9fr; gap: 56px; align-items: start; }
+
+/* The one loud thing, in the brand's own pairing. */
+.play-panel { padding: 44px; color: var(--paper); background: var(--forest); border-radius: 24px; box-shadow: 0 28px 80px rgba(27,42,34,.18); }
+.play-panel-focus { margin: 0 0 30px; color: var(--lime); font-size: 12px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.play-panel-read { margin: 0 0 14px; color: var(--sage); font-size: 19px; line-height: 1.55; }
+.play-panel h2 { margin: 0 0 32px; font-family: Georgia, "Times New Roman", serif; font-weight: 500; font-size: clamp(38px, 4.6vw, 58px); line-height: .98; letter-spacing: -.05em; color: var(--paper); }
+.play-panel ol { margin: 0 0 30px; padding-left: 22px; }
+.play-panel li { margin-bottom: 17px; color: #d5ded7; font-size: 18px; line-height: 1.65; }
+.play-panel li::marker { color: var(--lime); font-weight: 800; }
+.play-panel li:last-child { margin-bottom: 0; }
+.play-panel-note { margin: 0 0 26px; padding-top: 26px; border-top: 1px solid var(--light); color: var(--sage); font-size: 17px; line-height: 1.7; }
+.play-panel > a { color: var(--lime); font-weight: 800; font-size: 15px; text-decoration: none; }
+.play-panel > a:hover { text-decoration: underline; }
+
+/* The rail is a record, not a stack of cards. */
+.room-rail { display: flex; flex-direction: column; }
+.rail-figure { padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+.rail-figure-number { display: block; font: 500 clamp(64px, 8vw, 92px)/1 Georgia, serif; letter-spacing: -.06em; color: var(--forest); }
+.rail-figure-label { display: block; margin: 12px 0 12px; color: var(--muted); font-size: 17px; line-height: 1.45; }
+.rail-figure-empty { padding-top: 4px; }
+.rail-figure a, .rail-item a { color: var(--rust); font-weight: 800; font-size: 14px; text-decoration: none; }
+.rail-figure a:hover, .rail-item a:hover { text-decoration: underline; }
+
+.rail-item { padding: 26px 0; border-bottom: 1px solid var(--line); }
+.rail-item:last-child { border-bottom: 0; }
+.rail-item h3 { margin: 0 0 10px; font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 15px; font-weight: 850; letter-spacing: -.01em; color: var(--ink); }
+.rail-item p { margin: 0 0 12px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.rail-item blockquote { margin: 0 0 14px; padding-left: 16px; border-left: 2px solid var(--rust); font: 500 20px/1.4 Georgia, serif; color: var(--ink); }
+.rail-read-title { color: var(--ink) !important; font-weight: 800; margin-bottom: 4px !important; }
+.rail-counts p { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; color: var(--muted); }
+.rail-counts span { font: 500 32px/1 Georgia, serif; letter-spacing: -.04em; color: var(--forest); }
+.rail-counts a { display: inline-block; margin-top: 12px; }
+.rail-situation p { color: var(--ink); }
+
+.room .first-run, .room .member-notice { margin-bottom: 42px; }
+
+@media (max-width: 940px) {
+  .room { width: min(100% - 30px, 1180px); padding: 38px 0 64px; }
+  .room-grid { grid-template-columns: 1fr; gap: 36px; }
+  .play-panel { padding: 28px 22px; border-radius: 20px; }
+  .rail-figure { padding-top: 4px; }
+}
+
+/* ---------- First run ----------
+   This was a second dark panel, which gave the page two loud things and left
+   the play no longer leading. Orientation should be quiet. */
+.first-run { margin: 0 0 1.8rem; padding: 1.1rem 0 1.3rem; border-top: 1px solid rgba(23,35,29,0.16); border-bottom: 1px solid rgba(23,35,29,0.16); }
+.first-run-top { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.first-run-lede-head { margin: 0; font-size: 0.95rem; font-weight: 700; color: #14201b; }
+.first-run-close { border: 0; padding: 0; background: none; font: inherit; font-size: 0.88rem; color: #5a6a60; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.first-run-close:hover { color: #153c2f; }
+.first-run-lede { margin: 0.5rem 0 0.7rem; line-height: 1.65; color: #5a6a60; }
+.first-run-list { margin: 0; padding-left: 1.1rem; }
+.first-run-list li { margin-bottom: 0.4rem; line-height: 1.65; color: #5a6a60; }
+.first-run-list li:last-child { margin-bottom: 0; }
+.first-run-list strong { color: #14201b; }
+
+/* ================= The room =================
    The member home used to be seven boxes with the same border, the same
    radius and the same tracked-out label above each one, so nothing led and
    the eye had nowhere to land. One element carries the page now: the play.
