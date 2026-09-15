@@ -6,7 +6,7 @@ duration_min: 4
 stages: [in_process, first_year, established]
 focus_areas: [coparent_comms, kids_wellbeing]
 custody_fit: [fifty_fifty, primary, eow, undetermined]
-published: false
+published: true
 ---
 
 For the first few months, the first thing I asked when the boys came back was how their week had gone. How things were over there. What they did.
