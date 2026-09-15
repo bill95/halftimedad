@@ -95,7 +95,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 1000,
-        system: buildSystemPrompt(channel, outcome),
+        system: buildSystemPrompt(channel, outcome, access.firstName),
         messages: [{ role: "user", content: draft }],
       }),
     });

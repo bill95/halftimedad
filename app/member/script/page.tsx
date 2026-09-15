@@ -13,7 +13,7 @@ export default async function ScriptPage() {
 
   return (
     <>
-      <MemberHeader />
+      <MemberHeader founderNumber={access.founderNumber} tier={access.tier} />
       <main className="section-shell member-home">
         <div className="member-masthead">
           <span>The script</span>

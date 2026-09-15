@@ -7,9 +7,8 @@ import SignOutButton from "@/components/SignOutButton";
  * The marketing header sells the membership. Showing "Join the village" to a
  * man who already joined reads as though the site does not know him.
  *
- * There are five surfaces back here now and they used to be reachable only
- * from cards on the member home, which meant every page but that one was a
- * dead end. Free accounts see only what they have.
+ * The script sits outside the paid block on purpose: a free account gets one
+ * rewrite, and a tool he cannot find is a conversion lever that never fires.
  */
 export default function MemberHeader({
   founderNumber,
@@ -31,6 +30,7 @@ export default function MemberHeader({
         {/* Deliberately not .site-header nav: that element is hidden below
             940px, which left members with no navigation at all on a phone. */}
         <nav className="member-nav" aria-label="Member navigation">
+          <Link href="/member/script">Script</Link>
           {tier === "paid" ? (
             <>
               <Link href="/member/check-in">Check-in</Link>
