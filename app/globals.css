@@ -356,3 +356,14 @@ button.member-header-signout { border: 0; padding: 0; background: none; font: in
 }
 .member-header-number { white-space: nowrap; }
 @media (max-width: 680px) { .member-header-number { display: none; } }
+
+/* ---------- The script ---------- */
+.script-result { margin-top: 2.4rem; }
+.script-warning { margin: 0 0 1.6rem; padding: 0.2rem 0 0.2rem 1.1rem; border-left: 2px solid var(--rust); font-family: Georgia, "Times New Roman", serif; font-size: 1.1rem; line-height: 1.6; color: var(--ink); }
+.script-output { margin-bottom: 2rem; }
+.script-output-body { margin: 0; padding: 1.2rem 1.3rem; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; font-size: 1.05rem; line-height: 1.75; color: var(--ink); white-space: pre-wrap; }
+.script-copy { border: 0; padding: 0; background: none; font: inherit; font-size: 0.85rem; letter-spacing: 0; text-transform: none; color: var(--forest); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; display: inline-flex; align-items: center; min-height: 44px; }
+.script-changes ul { list-style: none; margin: 0; padding: 0; }
+.script-changes li { padding: 0.9rem 0 0.9rem 1.1rem; border-left: 1px solid var(--line); line-height: 1.7; color: #334a40; }
+.script-footnote { margin-top: 1.2rem; color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
+main.member-home > .script-footnote { margin-top: 3.5rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
