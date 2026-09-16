@@ -1,6 +1,6 @@
 # The Founding Hundred
 
-The Founding Hundred recognizes the first 100 dads who help shape HalfTimeDad before its public launch on October 1, 2026. We are not rewarding people merely for buying first; we are honoring the dads who believed first.
+The Founding Hundred recognizes the first 100 dads who help shape HalfTimeDad before its public launch on January 31, 2027. We are not rewarding people merely for buying first; we are honoring the dads who believed first.
 
 ## Offer
 

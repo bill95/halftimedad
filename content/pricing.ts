@@ -1,7 +1,7 @@
 /**
  * One source of truth for what we charge and what we say we charge.
  *
- * Stripe cannot schedule a price change, so the Oct 1 flip from founding to
+ * Stripe cannot schedule a price change, so the Jan 31, 2027 flip from founding to
  * standard is made here, in the app, by setting NEXT_PUBLIC_ACTIVE_TIER to
  * "standard" in Vercel and redeploying. Nothing else needs to change.
  *

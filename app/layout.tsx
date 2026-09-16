@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://halftimedad.co"),
   openGraph: {
     title: "HalfTimeDad | The Founding Hundred",
-    description: "Perspective before reaction. Join the first 100 dads helping build the village before October 1, 2026.",
+    description: "Perspective before reaction. Join the first 100 dads helping build the village before January 31, 2027.",
     url: "https://halftimedad.co",
     siteName: "HalfTimeDad",
     type: "website",
