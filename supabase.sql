@@ -1,3 +1,7 @@
+-- OUT OF DATE: this is the original bootstrap. For what production actually
+-- enforces (tables, grants, policies, functions, triggers), see
+-- supabase/schema-snapshot-2026-10-14.sql and the dated migrations beside it.
+
 create table if not exists public.founding_members (
   founder_number bigint generated always as identity primary key,
   created_at timestamptz not null default now(),

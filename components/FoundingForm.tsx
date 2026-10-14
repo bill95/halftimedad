@@ -4,7 +4,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { trackClient } from "@/components/Attribution";
 import { pricingFor, type Plan } from "@/content/pricing";
 
-type Result = { founderNumber?: number; message?: string; referralCode?: string };
+// No founder number yet: it is issued when the payment clears.
+type Result = { reservationId?: string; message?: string; referralCode?: string };
 
 // Both tiers happen to save the same 17% on annual ($99 vs $119.88, $190 vs $228).
 // Recheck this number if either price ever changes.
@@ -27,11 +28,11 @@ export default function FoundingForm() {
     trackClient("upgrade_viewed", { surface: "founding_form" });
   }, []);
 
-  async function openCheckout(details: { email: string; founderNumber: number; referralCode?: string }) {
+  async function openCheckout(details: { email: string; reservationId: string; referralCode?: string }) {
     const response = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...details, plan }),
+      body: JSON.stringify(details),
     });
     const data = (await response.json()) as { url?: string; message?: string };
     if (!response.ok || !data.url) throw new Error(data.message || "Secure checkout could not be opened.");
@@ -53,7 +54,7 @@ export default function FoundingForm() {
         body: JSON.stringify({ ...payload, plan, referral }),
       });
       const saved = (await response.json()) as Result;
-      if (!response.ok || !saved.founderNumber) throw new Error(saved.message || "We could not reserve your founder number.");
+      if (!response.ok || !saved.reservationId) throw new Error(saved.message || "We could not save your reservation.");
       setResult(saved);
       // Newsletter opt-in — non-blocking, does not affect checkout
       if (newsletter && submittedEmail) {
@@ -63,7 +64,7 @@ export default function FoundingForm() {
           body: JSON.stringify({ email: submittedEmail, firstName: String(payload.firstName || "") }),
         }).catch(() => { /* silent — newsletter signup must never block checkout */ });
       }
-      await openCheckout({ email: submittedEmail, founderNumber: saved.founderNumber, referralCode: saved.referralCode });
+      await openCheckout({ email: submittedEmail, reservationId: saved.reservationId, referralCode: saved.referralCode });
     } catch (error) {
       setResult((current) => ({ ...current, message: error instanceof Error ? error.message : "Something went wrong." }));
       setStatus("checkout-error");
@@ -71,18 +72,18 @@ export default function FoundingForm() {
   }
 
   async function retryCheckout() {
-    if (!result.founderNumber) return setStatus("idle");
+    if (!result.reservationId) return setStatus("idle");
     setStatus("loading");
     try {
-      await openCheckout({ email, founderNumber: result.founderNumber, referralCode: result.referralCode });
+      await openCheckout({ email, reservationId: result.reservationId, referralCode: result.referralCode });
     } catch (error) {
       setResult((current) => ({ ...current, message: error instanceof Error ? error.message : "Checkout is unavailable." }));
       setStatus("checkout-error");
     }
   }
 
-  if (status === "checkout-error" && result.founderNumber) {
-    return <div className="signup-card success-card" role="alert"><p className="kicker">Founder #{String(result.founderNumber).padStart(3, "0")} reserved</p><h3>Your place is safe.</h3><p>{result.message} You have not been charged.</p><button className="button button-primary submit-button" onClick={retryCheckout}>Try secure checkout again</button><button className="text-button" onClick={() => setStatus("idle")}>Return to the form</button></div>;
+  if (status === "checkout-error" && result.reservationId) {
+    return <div className="signup-card success-card" role="alert"><p className="kicker">Reservation saved</p><h3>Your place is safe.</h3><p>{result.message} You have not been charged. Your founder number is issued the moment payment goes through.</p><button className="button button-primary submit-button" onClick={retryCheckout}>Try secure checkout again</button><button className="text-button" onClick={() => setStatus("idle")}>Return to the form</button></div>;
   }
 
   return <form className="signup-card" onSubmit={submit}>
@@ -90,7 +91,7 @@ export default function FoundingForm() {
       <button type="button" className={plan === "monthly" ? "active" : ""} onClick={() => setPlan("monthly")} aria-pressed={plan === "monthly"}><span>Monthly</span><strong>{MONTHLY.display} <small>/ month</small></strong></button>
       <button type="button" className={plan === "annual" ? "active" : ""} onClick={() => setPlan("annual")} aria-pressed={plan === "annual"}><span>Annual · {ANNUAL_SAVINGS}</span><strong>{ANNUAL.display} <small>/ year</small></strong></button>
     </div>
-    <p className="form-explainer">Membership begins today. After reserving your founder number, you’ll continue to Stripe’s secure checkout.</p>
+    <p className="form-explainer">Membership begins today. You’ll continue to Stripe’s secure checkout. Your founder number is issued when payment goes through.</p>
     <div className="field-row"><label><span>First name</span><input name="firstName" autoComplete="given-name" required /></label><label><span>Email</span><input name="email" type="email" autoComplete="email" required /></label></div>
     <label><span>What would help most right now? <em>Optional</em></span><textarea name="challenge" rows={3} placeholder="A difficult message, parenting schedule, money, feeling less alone…" /></label>
     <label className="newsletter-checkbox-label"><input type="checkbox" checked={newsletter} onChange={(e) => setNewsletter(e.target.checked)} /><span>Also subscribe me to <strong>The Sunday Reset</strong> — a free weekly note from Bill.</span></label>

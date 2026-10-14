@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/access";
 import { trackServer } from "@/lib/analytics";
+import { logScriptUsage } from "@/lib/supabase-admin";
 import {
   buildSystemPrompt,
   CHANNELS,
@@ -124,14 +125,20 @@ export async function POST(request: Request) {
     );
   }
 
-  await supabase.from("script_usage").insert({
-    user_id: access.userId,
-    channel,
-    outcome,
-    input_chars: draft.length,
-    output_chars: parsed.rewritten.length,
-    was_paid: isPaid,
-  });
+  // The limits above count these rows. Members hold no INSERT grant on
+  // script_usage, so this used to fail silently and the limits never counted.
+  try {
+    await logScriptUsage({
+      user_id: access.userId,
+      channel,
+      outcome,
+      input_chars: draft.length,
+      output_chars: parsed.rewritten.length,
+      was_paid: isPaid,
+    });
+  } catch (error) {
+    console.error("[script] usage log failed", error);
+  }
 
   await trackServer("script_used", { tier: isPaid ? "paid" : "free", channel, outcome });
 
