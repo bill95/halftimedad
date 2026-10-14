@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteFooter from "@/components/SiteFooter";
 import MemberHeader from "@/components/MemberHeader";
+import { TrackOnMount } from "@/components/Attribution";
 import { requirePaid } from "@/lib/access";
 import { getAsset, KIND_LABEL, provenance } from "@/lib/library";
 import { renderMarkdown } from "@/lib/markdown";
@@ -23,6 +24,7 @@ export default async function AssetPage({ params }: { params: Promise<{ slug: st
     <>
       <MemberHeader founderNumber={member.founderNumber} tier={member.tier} />
       <main className="section-shell charter-page">
+        <TrackOnMount name="play_read" props={{ slug: asset.slug, kind: asset.kind }} />
         <Link className="member-tile-link" href="/member/library">
           Back to the library
         </Link>
