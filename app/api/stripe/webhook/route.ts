@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { activateCheckoutSession, syncCheckoutFailure, syncCurrentSubscription, syncInvoiceSubscription } from "@/lib/membership";
+import { activateCheckoutSession, type Activation, syncCheckoutFailure, syncCurrentSubscription, syncInvoiceSubscription } from "@/lib/membership";
 import { getStripe } from "@/lib/stripe";
 import { claimStripeWebhookEvent, completeStripeWebhookEvent, getFounderFirstName, releaseStripeWebhookEvent } from "@/lib/supabase-admin";
 import { sendFounderWelcome } from "@/lib/email";
@@ -11,10 +11,10 @@ import { trackServer } from "@/lib/analytics";
  * (stripe_webhook_events), so a retried delivery cannot send it twice. The
  * /welcome page also activates the session but never emails.
  */
-async function welcomeIfPaid(session: Stripe.Checkout.Session) {
-  const founderNumber = session.metadata?.founder_number;
+async function welcomeIfPaid({ session, founderNumber }: Activation) {
+  // founderNumber is only set once the payment has cleared.
   const email = session.customer_details?.email || session.customer_email;
-  if (!founderNumber || !email || session.status !== "complete" || session.payment_status === "unpaid") return;
+  if (!founderNumber || !email) return;
   // Stripe calls this, not the browser, so there is no attribution cookie.
   // The checkout route copied it into the session metadata instead.
   await trackServer("paid", {

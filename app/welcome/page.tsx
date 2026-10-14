@@ -17,9 +17,9 @@ export default async function WelcomePage({ searchParams }: { searchParams: Prom
   let confirmed = false;
   if (sessionId) {
     try {
-      const session = await activateCheckoutSession(sessionId);
+      const { session, founderNumber: issued } = await activateCheckoutSession(sessionId);
       confirmed = session.status === "complete" && session.payment_status !== "unpaid";
-      founderNumber = session.metadata?.founder_number || "";
+      founderNumber = issued ?? "";
       email = session.customer_details?.email || session.customer_email || "";
     } catch (error) {
       console.error("Could not confirm Stripe Checkout session", error);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { upsertMonitorState } from "@/lib/supabase-admin";
 
 /**
  * Peace Monitor state for signed-in users.
@@ -80,8 +81,10 @@ export async function PUT(request: Request) {
     .eq("user_id", user.id)
     .maybeSingle();
 
-  const { error } = await supabase.from("monitor_state").upsert(
-    {
+  // Members can read monitor_state but hold no INSERT or UPDATE grant on it,
+  // so the write goes through the service role for the verified user.
+  try {
+    await upsertMonitorState({
       user_id: user.id,
       streak_started_at: new Date(clampStart(body.streakStartedAt)).toISOString(),
       longest_streak: clampInt(body.longestStreak),
@@ -90,10 +93,11 @@ export async function PUT(request: Request) {
       // Stamped once, the first time a browser's count is carried onto an
       // account. Tells us later how many free signups came from the tracker.
       adopted_local_at: existing?.adopted_local_at ?? (existing ? null : new Date().toISOString()),
-    },
-    { onConflict: "user_id" }
-  );
+    });
+  } catch (error) {
+    console.error("Monitor save failed", error);
+    return NextResponse.json({ message: "Could not save." }, { status: 500 });
+  }
 
-  if (error) return NextResponse.json({ message: "Could not save." }, { status: 500 });
   return NextResponse.json({ ok: true, adopted: !existing });
 }
