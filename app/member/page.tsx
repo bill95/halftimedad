@@ -3,6 +3,8 @@ import SiteFooter from "@/components/SiteFooter";
 import MemberHeader from "@/components/MemberHeader";
 import FirstRun from "@/components/FirstRun";
 import { TrackOnMount } from "@/components/Attribution";
+import ShareHalfTimeDad from "@/components/ShareHalfTimeDad";
+import { shareUrl } from "@/lib/share";
 import Greeting from "@/components/Greeting";
 import { createClient } from "@/lib/supabase/server";
 import { requireAccess } from "@/lib/access";
@@ -131,6 +133,11 @@ export default async function MemberHome({
               That part is for members. Your account, your count and this week&rsquo;s play stay free
               either way.
             </p>
+            <p>
+              <Link className="member-tile-link" href="/member/upgrade">
+                See founding membership
+              </Link>
+            </p>
           </section>
         ) : null}
 
@@ -188,7 +195,7 @@ export default async function MemberHome({
                   Three questions a week, kept as a record you can read back. It is the part that
                   compounds.
                 </p>
-                <Link href="/#join">What membership costs</Link>
+                <Link href="/member/upgrade">See founding membership</Link>
               </div>
             )}
 
@@ -214,6 +221,12 @@ export default async function MemberHome({
                 <Link href="/member/passages">Mark what you have been through</Link>
               </div>
             ) : null}
+
+            <div className="rail-item">
+              <h3>Know a dad who needs this?</h3>
+              <p>Send him your link. It costs him nothing to start, and you will be the reason he did.</p>
+              <ShareHalfTimeDad className="button-secondary" label="Share your link" url={shareUrl(member.userId)} />
+            </div>
 
             <div className="rail-item rail-situation">
               <h3>Where you are</h3>

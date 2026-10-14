@@ -88,7 +88,7 @@ export default function SettingsPanel({ email, tier, weeklyNudge, billingUrl }: 
             Manage membership and billing
           </a>
         ) : (
-          <a className="button button-primary" href="/#join">
+          <a className="button button-primary" href="/member/upgrade">
             See what membership costs
           </a>
         )}

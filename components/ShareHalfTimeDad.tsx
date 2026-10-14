@@ -5,15 +5,17 @@ import { useState } from "react";
 type ShareHalfTimeDadProps = {
   className?: string;
   label?: string;
+  /** A member's personal link (?ref=...). Defaults to the homepage. */
+  url?: string;
 };
 
 const shareText = "No dad should have to navigate the hardest season of his life alone. HalfTimeDad offers practical tools and perspective for dads navigating divorce.";
 
-export default function ShareHalfTimeDad({ className = "", label = "Share with a dad" }: ShareHalfTimeDadProps) {
+export default function ShareHalfTimeDad({ className = "", label = "Share with a dad", url: shareLink }: ShareHalfTimeDadProps) {
   const [status, setStatus] = useState("");
 
   async function share() {
-    const url = `${window.location.origin}/`;
+    const url = shareLink ?? `${window.location.origin}/`;
 
     try {
       if (navigator.share) {
