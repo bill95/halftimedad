@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { trackClient } from "@/components/Attribution";
+import { readSource, trackClient } from "@/components/Attribution";
 import { pricingFor, type Plan } from "@/content/pricing";
 
 // No founder number yet: it is issued when the payment clears.
@@ -47,7 +47,9 @@ export default function FoundingForm() {
     const submittedEmail = String(payload.email || "");
     setEmail(submittedEmail);
     try {
-      const referral = new URLSearchParams(window.location.search).get("ref") || "";
+      // Credit a member's share link even if he browsed around before joining.
+      const firstTouch = readSource();
+      const referral = new URLSearchParams(window.location.search).get("ref") || (firstTouch.startsWith("ref:") ? firstTouch.slice(4) : "");
       const response = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

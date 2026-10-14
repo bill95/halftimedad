@@ -1,21 +1,5 @@
-export const CHANNELS = [
-  { value: "text", label: "Text message" },
-  { value: "email", label: "Email" },
-  { value: "app", label: "Co-parenting app" },
-] as const;
-
-export const OUTCOMES = [
-  { value: "request", label: "Asking for a change" },
-  { value: "respond", label: "Responding to an accusation" },
-  { value: "confirm", label: "Confirming logistics" },
-  { value: "decline", label: "Saying no" },
-] as const;
-
-export type Channel = (typeof CHANNELS)[number]["value"];
-export type Outcome = (typeof OUTCOMES)[number]["value"];
-
-export const FREE_LIFETIME_LIMIT = 1;
-export const PAID_MONTHLY_LIMIT = 100;
+import type { Channel, Outcome } from "@/lib/script/options";
+export { CHANNELS, OUTCOMES, FREE_MONTHLY_LIMIT, PAID_MONTHLY_LIMIT, type Channel, type Outcome } from "@/lib/script/options";
 
 const CHANNEL_NOTES: Record<Channel, string> = {
   text: "A text message. Keep it to a few sentences. No greeting and no sign-off.",

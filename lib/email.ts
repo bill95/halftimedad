@@ -16,7 +16,7 @@ function escape(value: string) {
   return value.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
-async function send(to: string, subject: string, html: string, text: string) {
+export async function sendLetter(to: string, subject: string, html: string, text: string) {
   const key = process.env.RESEND_API_KEY;
   if (!key) throw new Error("RESEND_API_KEY is not configured");
   const res = await fetch("https://api.resend.com/emails", {
@@ -69,5 +69,5 @@ export async function sendFounderWelcome(opts: { email: string; firstName?: stri
 <p>Bill</p>
 </div></body></html>`;
 
-  await send(opts.email, subject, html, text);
+  await sendLetter(opts.email, subject, html, text);
 }

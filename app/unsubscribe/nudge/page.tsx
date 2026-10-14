@@ -3,7 +3,7 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 
 export const metadata = {
-  title: "Sunday notes off",
+  title: "Email off",
   robots: { index: false, follow: false },
 };
 
@@ -60,16 +60,16 @@ export default async function UnsubscribeNudge({
   let body: React.ReactNode;
 
   if (done === "1") {
-    heading = "Done. No more Sunday notes.";
-    body = <p>The check-in is still there when you want it, and nothing else changes about your membership.</p>;
+    heading = "Done. No more of these emails.";
+    body = <p>No more Sunday notes or getting-started letters. Your account and everything in it stay exactly as they are. Receipts and sign-in links still arrive when you ask for them.</p>;
   } else if (done === "0" || !token) {
     heading = "We could not turn those off.";
     body = <p>That link may have expired. Email hello@halftimedad.co and it gets handled by a person.</p>;
   } else {
-    heading = "Turn off the Sunday notes?";
+    heading = "Turn off these emails?";
     body = (
       <>
-        <p>You will stop getting the Sunday check-in reminder. Nothing else about your membership changes, and you can turn it back on in settings.</p>
+        <p>You will stop getting the Sunday check-in reminder and the getting-started letters. Nothing else about your account changes, and you can turn them back on in settings.</p>
         <form action={turnOff}>
           <input type="hidden" name="t" value={token} />
           <button type="submit" className="button button-primary">Turn them off</button>
@@ -82,7 +82,7 @@ export default async function UnsubscribeNudge({
     <>
       <SiteHeader />
       <main className="section-shell legal-page">
-        <p className="kicker">Sunday notes</p>
+        <p className="kicker">Email from HalfTimeDad</p>
         <h1>{heading}</h1>
         {body}
       </main>

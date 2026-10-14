@@ -29,8 +29,8 @@ export default function SiteHeader() {
           <Link className="site-header-signin" href="/login">
             Sign in
           </Link>
-          <Link className="button button-small" href="/#join">
-            Join the village
+          <Link className="button button-small" href="/login">
+            Start free
           </Link>
         </div>
       </div>

@@ -60,10 +60,17 @@ export default function FirstRun({ tier }: { tier: "free" | "paid" }) {
             one browser.
           </li>
         )}
-        <li>
-          <strong>The library.</strong> Written for where you actually are, not a list of
-          everything.
-        </li>
+        {tier === "paid" ? (
+          <li>
+            <strong>The library.</strong> Written for where you actually are, not a list of
+            everything.
+          </li>
+        ) : (
+          <li>
+            <strong>The Script.</strong> Three rewrites a month for the message you do not know how
+            to answer. Find it in the menu.
+          </li>
+        )}
       </ol>
     </section>
   );

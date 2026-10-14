@@ -335,3 +335,65 @@ export async function unclaimPassage(userId: string, slug: string) {
   if (!response.ok) throw new Error(`Supabase passage delete failed (${response.status})`);
   return true;
 }
+
+/* ------------------------------------------------------------------------ *
+ * Anonymous Script trials (supabase/2026-10-14-script-trials.sql)
+ * ------------------------------------------------------------------------ */
+
+async function countRows(table: string, filters: Record<string, string>) {
+  const { base, headers } = config();
+  const query = new URLSearchParams({ ...filters, select: "id" });
+  const response = await fetch(`${base}/rest/v1/${table}?${query}`, {
+    headers: { ...headers, Prefer: "count=exact", Range: "0-0" },
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Supabase count on ${table} failed (${response.status})`);
+  return Number(response.headers.get("content-range")?.split("/")[1] ?? 0);
+}
+
+export async function countScriptTrials(sinceIso: string, visitor?: string) {
+  return countRows("script_trials", {
+    created_at: `gte.${sinceIso}`,
+    ...(visitor ? { visitor: `eq.${visitor}` } : {}),
+  });
+}
+
+export async function logScriptTrial(row: {
+  visitor: string;
+  channel: string;
+  outcome: string;
+  input_chars: number;
+  output_chars: number;
+}) {
+  const { base, headers } = config();
+  const response = await fetch(`${base}/rest/v1/script_trials`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(row),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Supabase script trial insert failed (${response.status}): ${await response.text()}`);
+}
+
+/** A published library piece, read past the member-only policy. Callers must check content/public-assets.ts first. */
+export async function getPublishedAssetAsAdmin(slug: string) {
+  const { base, headers } = config();
+  const query = new URLSearchParams({
+    slug: `eq.${slug}`,
+    published: "is.true",
+    select: "slug,title,dek,kind,duration_min,body_md,published_at",
+    limit: "1",
+  });
+  const response = await fetch(`${base}/rest/v1/assets?${query}`, { headers, next: { revalidate: 3600 } });
+  if (!response.ok) throw new Error(`Supabase public asset read failed (${response.status})`);
+  const [row] = (await response.json()) as Array<{
+    slug: string;
+    title: string;
+    dek: string | null;
+    kind: "guide" | "play" | "script";
+    duration_min: number;
+    body_md: string | null;
+    published_at: string | null;
+  }>;
+  return row ?? null;
+}
