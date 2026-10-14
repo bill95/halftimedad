@@ -185,3 +185,15 @@ export async function patchProfile(userId: string, patch: Record<string, unknown
 
   if (!response.ok) throw new Error(`Supabase profile write failed (${response.status}): ${await response.text()}`);
 }
+
+/** First name on a founder row, for the welcome email. */
+export async function getFounderFirstName(founderNumber: string | number) {
+  const { base, headers } = config();
+  const response = await fetch(
+    `${base}/rest/v1/founding_members?founder_number=eq.${encodeURIComponent(String(founderNumber))}&select=first_name&limit=1`,
+    { headers, cache: "no-store" }
+  );
+  if (!response.ok) return null;
+  const [row] = (await response.json()) as Array<{ first_name: string | null }>;
+  return row?.first_name ?? null;
+}

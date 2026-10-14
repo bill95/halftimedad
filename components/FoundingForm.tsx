@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { trackClient } from "@/components/Attribution";
 import { pricingFor, type Plan } from "@/content/pricing";
 
 type Result = { founderNumber?: number; message?: string; referralCode?: string };
@@ -21,6 +22,11 @@ export default function FoundingForm() {
 
   const selected = plan === "annual" ? ANNUAL : MONTHLY;
 
+  // The founding form is the upgrade surface until an in-app one exists.
+  useEffect(() => {
+    trackClient("upgrade_viewed", { surface: "founding_form" });
+  }, []);
+
   async function openCheckout(details: { email: string; founderNumber: number; referralCode?: string }) {
     const response = await fetch("/api/stripe/checkout", {
       method: "POST",
@@ -35,6 +41,7 @@ export default function FoundingForm() {
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("loading");
+    trackClient("checkout_started", { plan });
     const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
     const submittedEmail = String(payload.email || "");
     setEmail(submittedEmail);

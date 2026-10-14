@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./stripe.css";
 import "./newsletter.css";
+import { Analytics } from "@vercel/analytics/next";
+import Attribution from "@/components/Attribution";
 
 export const metadata: Metadata = {
   title: { default: "HalfTimeDad | Perspective Before Reaction", template: "%s | HalfTimeDad" },
@@ -22,7 +24,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Attribution />
+        <Analytics />
+      </body>
     </html>
   );
 }

@@ -5,7 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { FINDINGS, RESEARCH_UPDATED, type Citation } from "@/content/research";
 
 export const metadata: Metadata = {
-  title: "What the research says about dads after divorce | HalfTimeDad",
+  title: "What the research says about dads after divorce",
   description:
     "How a separated dad parents matters more than how many days he gets, and conflict is what hurts kids. The studies behind HalfTimeDad, in plain language.",
   alternates: { canonical: "https://halftimedad.co/research" },
@@ -15,6 +15,13 @@ export const metadata: Metadata = {
       "How you parent matters more than how often. The studies behind HalfTimeDad, in plain language.",
     url: "https://halftimedad.co/research",
     type: "article",
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "HalfTimeDad: what the research says" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "What the research says about dads after divorce",
+    description: "How you parent matters more than how often. The studies behind HalfTimeDad, in plain language.",
+    images: ["/og.jpg"],
   },
 };
 

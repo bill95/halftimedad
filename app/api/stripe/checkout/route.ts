@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { getPriceId, getStripe } from "@/lib/stripe";
 import { claimFounderForUser, getFounderForCheckout, updateFounder } from "@/lib/supabase-admin";
 import { createClient } from "@/lib/supabase/server";
+import { firstTouchSource } from "@/lib/analytics";
 
 type CheckoutPayload = { plan?: "monthly" | "annual"; email?: string; founderNumber?: number; referralCode?: string };
 
@@ -24,6 +25,8 @@ export async function POST(request: Request) {
     const plan = reservedFounder.plan_interest;
 
     const stripe = getStripe();
+    // First-touch attribution rides along so the webhook can credit the sale.
+    const source = await firstTouchSource();
     // Build redirect URLs from the host that received this request. This keeps
     // preview and production checkouts on their own domains and avoids stale or
     // malformed environment values breaking Stripe Checkout.
@@ -38,10 +41,11 @@ export async function POST(request: Request) {
       line_items: [{ price: getPriceId(plan), quantity: 1 }],
       success_url: `${siteUrl}/welcome?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/?checkout=cancelled#join`,
-      allow_promotion_codes: false,
+      // Creator and partner codes (Stripe > Product catalog > Coupons > Promotion codes).
+      allow_promotion_codes: true,
       billing_address_collection: "auto",
       submit_type: "subscribe",
-      metadata: { founder_number: founder, founding_plan: plan, referral_code: referralCode },
+      metadata: { founder_number: founder, founding_plan: plan, referral_code: referralCode, source },
       subscription_data: { metadata: { founder_number: founder, founding_plan: plan } },
       custom_text: { submit: { message: "Founding pricing remains locked while your membership stays active. Cancel anytime." } },
     });

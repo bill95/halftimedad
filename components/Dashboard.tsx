@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { trackClient } from "@/components/Attribution";
 
 type DashboardState = {
   createdAt: number;
@@ -116,7 +117,9 @@ export default function Dashboard() {
     let mode: ViewMode = "public";
 
     if (hash === "#mine") {
-      initial = stored && ownerId === stored.id ? stored : freshState();
+      const owned = stored && ownerId === stored.id;
+      initial = owned ? stored : freshState();
+      if (!owned) trackClient("monitor_started", { entry: "link" });
       mode = "own";
       localStorage.setItem(STORAGE_KEY, encodeState(initial));
       localStorage.setItem(OWNER_KEY, initial.id);
@@ -160,7 +163,13 @@ export default function Dashboard() {
           return;
         }
 
-        const carried = stored ?? initial;
+        // Only a count this browser actually owns gets carried up. The public
+        // demo and someone else's shared link are not his days, and saving
+        // them would hand a new account a count he never kept. With nothing
+        // owned, the page stays as it is and "Create your monitor" starts one.
+        const ownedLocal = stored && ownerId === stored.id ? stored : null;
+        const carried = mode === "own" ? initial : ownedLocal;
+        if (!carried) return;
         await saveToServer(carried);
         setState(carried);
         setViewMode("own");
@@ -256,6 +265,7 @@ export default function Dashboard() {
   }
 
   function createNew() {
+    trackClient("monitor_started", { entry: viewMode === "own" ? "reset_dashboard" : "create_button", signedIn });
     const next = freshState();
     persist(next, true);
     setShowCreate(false);

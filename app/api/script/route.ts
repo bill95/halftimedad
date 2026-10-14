@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAccess } from "@/lib/access";
+import { trackServer } from "@/lib/analytics";
 import {
   buildSystemPrompt,
   CHANNELS,
@@ -73,6 +74,7 @@ export async function POST(request: Request) {
       .eq("user_id", access.userId);
 
     if ((count ?? 0) >= FREE_LIFETIME_LIMIT) {
+      await trackServer("upgrade_viewed", { surface: "script_limit" });
       return NextResponse.json({ message: "upgrade_required" }, { status: 402 });
     }
   }
@@ -130,6 +132,8 @@ export async function POST(request: Request) {
     output_chars: parsed.rewritten.length,
     was_paid: isPaid,
   });
+
+  await trackServer("script_used", { tier: isPaid ? "paid" : "free", channel, outcome });
 
   return NextResponse.json({
     rewritten: parsed.rewritten,

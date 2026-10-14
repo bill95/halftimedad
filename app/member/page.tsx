@@ -2,6 +2,7 @@ import Link from "next/link";
 import SiteFooter from "@/components/SiteFooter";
 import MemberHeader from "@/components/MemberHeader";
 import FirstRun from "@/components/FirstRun";
+import { TrackOnMount } from "@/components/Attribution";
 import Greeting from "@/components/Greeting";
 import { createClient } from "@/lib/supabase/server";
 import { requireAccess } from "@/lib/access";
@@ -125,6 +126,7 @@ export default async function MemberHome({
 
         {cameFromLocked && !paid ? (
           <section className="member-notice">
+            <TrackOnMount name="upgrade_viewed" props={{ surface: "locked_page" }} />
             <p>
               That part is for members. Your account, your count and this week&rsquo;s play stay free
               either way.
@@ -159,7 +161,7 @@ export default async function MemberHome({
             ) : (
               <div className="rail-figure rail-figure-empty">
                 <span className="rail-figure-label">You have not started the count.</span>
-                <Link href="/peace-monitor">Start it</Link>
+                <Link href="/peace-monitor#mine">Start it</Link>
               </div>
             )}
 

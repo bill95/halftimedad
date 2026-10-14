@@ -2,7 +2,35 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { activateCheckoutSession, syncCheckoutFailure, syncCurrentSubscription, syncInvoiceSubscription } from "@/lib/membership";
 import { getStripe } from "@/lib/stripe";
-import { claimStripeWebhookEvent, completeStripeWebhookEvent, releaseStripeWebhookEvent } from "@/lib/supabase-admin";
+import { claimStripeWebhookEvent, completeStripeWebhookEvent, getFounderFirstName, releaseStripeWebhookEvent } from "@/lib/supabase-admin";
+import { sendFounderWelcome } from "@/lib/email";
+import { trackServer } from "@/lib/analytics";
+
+/**
+ * The welcome email goes out from here and only here. Events are claimed once
+ * (stripe_webhook_events), so a retried delivery cannot send it twice. The
+ * /welcome page also activates the session but never emails.
+ */
+async function welcomeIfPaid(session: Stripe.Checkout.Session) {
+  const founderNumber = session.metadata?.founder_number;
+  const email = session.customer_details?.email || session.customer_email;
+  if (!founderNumber || !email || session.status !== "complete" || session.payment_status === "unpaid") return;
+  // Stripe calls this, not the browser, so there is no attribution cookie.
+  // The checkout route copied it into the session metadata instead.
+  await trackServer("paid", {
+    plan: session.metadata?.founding_plan ?? "unknown",
+    promo: session.total_details?.amount_discount ? "yes" : "no",
+    source: session.metadata?.source ?? "unknown",
+  });
+  try {
+    const firstName = await getFounderFirstName(founderNumber);
+    await sendFounderWelcome({ email, firstName, founderNumber });
+  } catch (error) {
+    // Membership is already active. A failed email must not make Stripe retry
+    // the whole event; it is logged and can be resent by hand.
+    console.error(`Founder welcome email failed for #${founderNumber}`, error);
+  }
+}
 
 export async function POST(request: Request) {
   const signature = request.headers.get("stripe-signature");
@@ -25,7 +53,7 @@ export async function POST(request: Request) {
     switch (event.type) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded":
-        await activateCheckoutSession((event.data.object as Stripe.Checkout.Session).id);
+        await welcomeIfPaid(await activateCheckoutSession((event.data.object as Stripe.Checkout.Session).id));
         break;
       case "checkout.session.async_payment_failed":
         await syncCheckoutFailure((event.data.object as Stripe.Checkout.Session).id);
