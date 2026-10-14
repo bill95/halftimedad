@@ -5,6 +5,7 @@ import { getStripe } from "@/lib/stripe";
 import { claimStripeWebhookEvent, completeStripeWebhookEvent, getFounderFirstName, releaseStripeWebhookEvent } from "@/lib/supabase-admin";
 import { sendFounderWelcome } from "@/lib/email";
 import { trackServer } from "@/lib/analytics";
+import { notifyNewSignup } from "@/lib/notify";
 
 /**
  * The welcome email goes out from here and only here. Events are claimed once
@@ -22,14 +23,27 @@ async function welcomeIfPaid({ session, founderNumber }: Activation) {
     promo: session.total_details?.amount_discount ? "yes" : "no",
     source: session.metadata?.source ?? "unknown",
   });
+  const firstName = await getFounderFirstName(founderNumber).catch(() => null);
   try {
-    const firstName = await getFounderFirstName(founderNumber);
     await sendFounderWelcome({ email, firstName, founderNumber });
   } catch (error) {
     // Membership is already active. A failed email must not make Stripe retry
     // the whole event; it is logged and can be resent by hand.
     console.error(`Founder welcome email failed for #${founderNumber}`, error);
   }
+  const total = typeof session.amount_total === "number" ? `$${(session.amount_total / 100).toFixed(2)}` : null;
+  await notifyNewSignup({
+    kind: "paid",
+    email,
+    firstName,
+    details: {
+      "Founder #": founderNumber.padStart(3, "0"),
+      Plan: session.metadata?.founding_plan,
+      Paid: total,
+      "Promo code": session.total_details?.amount_discount ? "yes" : null,
+      Source: session.metadata?.source,
+    },
+  });
 }
 
 export async function POST(request: Request) {

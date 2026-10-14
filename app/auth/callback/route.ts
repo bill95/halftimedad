@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { linkFounderUser } from "@/lib/supabase-admin";
+import { getFounderRowByEmail, linkFounderUser } from "@/lib/supabase-admin";
 import { trackServer } from "@/lib/analytics";
 import { sendWelcomeStep } from "@/lib/onboarding";
+import { firstTouchSource } from "@/lib/analytics";
+import { notifyNewSignup } from "@/lib/notify";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -30,7 +32,14 @@ export async function GET(request: Request) {
   const createdMs = Date.parse(data.user.created_at ?? "");
   if (Number.isFinite(createdMs) && Date.now() - createdMs < 3 * 86_400_000) {
     const welcome = await sendWelcomeStep({ id: data.user.id, email: data.user.email, created_at: data.user.created_at });
-    if (welcome && welcome.outcome !== "already") await trackServer("account_created");
+    if (welcome && welcome.outcome !== "already") {
+      await trackServer("account_created");
+      // A founder signing in for the first time was already announced when he paid.
+      const founder = await getFounderRowByEmail(data.user.email).catch(() => null);
+      if (!founder || !["active", "past_due"].includes(founder.status)) {
+        await notifyNewSignup({ kind: "free", email: data.user.email, details: { Source: await firstTouchSource() } });
+      }
+    }
   }
 
   // /member routes onward from here: profile if it is missing, and the

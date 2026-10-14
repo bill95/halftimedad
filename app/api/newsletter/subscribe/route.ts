@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { firstTouchSource } from "@/lib/analytics";
+import { notifyNewSignup } from "@/lib/notify";
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,6 +76,8 @@ export async function POST(req: NextRequest) {
         console.log("Newsletter: automation event fired successfully", eventRes.status);
       }
     }
+
+    await notifyNewSignup({ kind: "newsletter", email, firstName, details: { Source: await firstTouchSource() } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
