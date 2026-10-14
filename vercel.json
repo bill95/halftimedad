@@ -1,7 +1,20 @@
 {
   "crons": [
-    { "path": "/api/cron/sunday", "schedule": "0 15 * * 0" },
-    { "path": "/api/cron/onboarding", "schedule": "0 16 * * *" },
-    { "path": "/api/cron/keep-alive", "schedule": "0 12 * * *" }
+    {
+      "path": "/api/cron/sunday",
+      "schedule": "0 15 * * 0"
+    },
+    {
+      "path": "/api/cron/onboarding",
+      "schedule": "0 16 * * *"
+    },
+    {
+      "path": "/api/cron/scoreboard",
+      "schedule": "0 15 * * 1"
+    },
+    {
+      "path": "/api/cron/keep-alive",
+      "schedule": "0 12 * * *"
+    }
   ]
 }
