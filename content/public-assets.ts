@@ -5,7 +5,7 @@
  * these are fetched with the service role, and only slugs on this list ever
  * are. Adding a slug here publishes it to the open web and to search.
  */
-export const PUBLIC_ASSET_SLUGS = ["the-first-exchange"] as const;
+export const PUBLIC_ASSET_SLUGS = ["the-first-exchange", "the-first-holidays"] as const;
 
 export function isPublicAsset(slug: string) {
   return (PUBLIC_ASSET_SLUGS as readonly string[]).includes(slug);
