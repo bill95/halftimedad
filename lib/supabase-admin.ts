@@ -340,9 +340,9 @@ export async function unclaimPassage(userId: string, slug: string) {
  * Anonymous Script trials (supabase/2026-10-14-script-trials.sql)
  * ------------------------------------------------------------------------ */
 
-async function countRows(table: string, filters: Record<string, string>) {
+export async function countRows(table: string, filters: Record<string, string>) {
   const { base, headers } = config();
-  const query = new URLSearchParams({ ...filters, select: "id" });
+  const query = new URLSearchParams({ select: "*", ...filters });
   const response = await fetch(`${base}/rest/v1/${table}?${query}`, {
     headers: { ...headers, Prefer: "count=exact", Range: "0-0" },
     cache: "no-store",
