@@ -400,3 +400,7 @@ main.member-home > .script-footnote { margin-top: 3.5rem; padding-top: 1.4rem; b
 .upgrade-list span{display:block;margin-top:4px;color:var(--muted);line-height:1.55}
 @media(max-width:860px){.upgrade-grid{grid-template-columns:1fr}}
 .upgrade-card{color:var(--paper);background:var(--deep);border-color:transparent}
+.story-byline{max-width:900px;margin:44px 0 0 auto;padding-top:28px;display:flex;align-items:center;gap:18px;border-top:1px solid var(--light)}
+.story-byline img{border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 3px rgba(216,237,120,.35)}
+.story-byline strong{display:block;font:500 22px Georgia,serif}
+.story-byline span{display:block;margin-top:4px;color:#c1cec5;line-height:1.5}
