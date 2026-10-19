@@ -5,6 +5,18 @@ import Link from "next/link";
 import { CHANNELS, OUTCOMES, FREE_MONTHLY_LIMIT, type Channel, type Outcome } from "@/lib/script/options";
 import { trackClient } from "@/components/Attribution";
 
+/**
+ * The homepage example: a draft a dad might be about to send, and the kind of
+ * rewrite The Script gives back. Illustrative, written by us, not a real
+ * member's message. Keeps the other parent unnamed and nobody the villain.
+ */
+const EXAMPLE = {
+  before:
+    "40 minutes late AGAIN. The kids sat by the door with their coats on the whole time. If you can't respect the schedule maybe we need to have lawyers sort it out.",
+  after:
+    "The kids were ready at 5:00 and pickup was at 5:40. Can we either keep 5:00, or text by 4:30 if you're running behind? That way they're not waiting by the door.",
+};
+
 type Result = {
   rewritten: string;
   changes: string[];
@@ -77,6 +89,32 @@ export default function ScriptForm({ mode, tier = "free" }: { mode: "try" | "mem
 
   return (
     <div className="checkin-form script-form">
+      {mode === "try" && !result && !draft ? (
+        <div className="script-example">
+          <div className="script-example-pair">
+            <p className="script-example-before">
+              <span>Before</span>
+              {EXAMPLE.before}
+            </p>
+            <p className="script-example-after">
+              <span>After The Script</span>
+              {EXAMPLE.after}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="script-example-try"
+            onClick={() => {
+              setDraft(EXAMPLE.before);
+              setOutcome("request");
+              trackClient("script_example_loaded", { mode });
+            }}
+          >
+            Try it with this example →
+          </button>
+        </div>
+      ) : null}
+
       <label className="checkin-field">
         <span>{mode === "try" ? "The message you got, or the one you are about to send" : "Your message"}</span>
         <textarea
