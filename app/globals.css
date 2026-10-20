@@ -401,20 +401,20 @@ main.member-home > .script-footnote { margin-top: 3.5rem; padding-top: 1.4rem; b
 @media(max-width:860px){.upgrade-grid{grid-template-columns:1fr}}
 .upgrade-card{color:var(--paper);background:var(--deep);border-color:transparent}
 .story-byline{max-width:900px;margin:44px 0 0 auto;padding-top:28px;display:flex;align-items:center;gap:18px;border-top:1px solid var(--light)}
-.story-byline img{border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 3px rgba(216,237,120,.35)}
+.story-monogram{width:76px;height:76px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--lime);color:#1c2e25;font:500 36px Georgia,serif;box-shadow:0 0 0 3px rgba(216,237,120,.35)}
 .story-byline strong{display:block;font:500 22px Georgia,serif}
 .story-byline span{display:block;margin-top:4px;color:#c1cec5;line-height:1.5}
 
 /* Podcast listener welcome (components/PodcastWelcome.tsx) */
 .podcast-welcome{padding:14px 0;color:var(--paper);background:var(--forest)}
 .podcast-welcome-inner{display:flex;align-items:center;gap:16px}
-.podcast-welcome-photo{flex:none;border-radius:50%;border:2px solid var(--lime);object-fit:cover}
+.podcast-welcome-photo{width:52px;height:52px;flex:none;border-radius:50%;border:2px solid var(--lime);display:grid;place-items:center;color:var(--lime);font:500 24px Georgia,serif}
 .podcast-welcome-copy{display:grid;gap:3px;font-size:14px;line-height:1.5}
 .podcast-welcome-copy strong{color:var(--lime);font:500 19px Georgia,serif}
 .podcast-welcome-copy span{color:#d5ded7}
 .podcast-welcome-copy code{padding:1px 7px;border-radius:6px;color:var(--deep);background:var(--lime);font:800 13px ui-monospace,monospace;letter-spacing:.06em}
 .podcast-welcome-sign{margin-left:auto;color:var(--sage);font:italic 15px Georgia,serif;white-space:nowrap}
-@media(max-width:680px){.podcast-welcome-inner{align-items:flex-start;gap:12px}.podcast-welcome-photo{width:42px;height:42px}.podcast-welcome-copy{font-size:13px}.podcast-welcome-copy strong{font-size:17px}.podcast-welcome-sign{display:none}}
+@media(max-width:680px){.podcast-welcome-inner{align-items:flex-start;gap:12px}.podcast-welcome-photo{width:42px;height:42px;font-size:20px}.podcast-welcome-copy{font-size:13px}.podcast-welcome-copy strong{font-size:17px}.podcast-welcome-sign{display:none}}
 
 /* Before/after example in The Script, homepage only */
 .script-example{margin-bottom:18px}
