@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     url: "https://halftimedad.co",
     siteName: "HalfTimeDad",
     type: "website",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "HalfTimeDad — Perspective before reaction" }],
+    images: [{ url: "/og.jpg?v=2", width: 1200, height: 630, alt: "HalfTimeDad — Perspective before reaction" }],
   },
-  twitter: { card: "summary_large_image", title: "HalfTimeDad | The Founding Hundred", description: "Perspective before reaction.", images: ["/og.jpg"] },
+  twitter: { card: "summary_large_image", title: "HalfTimeDad | The Founding Hundred", description: "Perspective before reaction.", images: ["/og.jpg?v=2"] },
   robots: { index: true, follow: true },
 };
 
