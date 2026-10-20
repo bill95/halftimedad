@@ -4,6 +4,7 @@ import FoundingForm from "@/components/FoundingForm";
 import ScriptForm from "@/components/ScriptForm";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import ShareHalfTimeDad from "@/components/ShareHalfTimeDad";
+import PodcastWelcome from "@/components/PodcastWelcome";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -16,10 +17,13 @@ const principles = [
 
 export default function Home() {
   return <><SiteHeader /><main>
+    <PodcastWelcome />
     <section className="hero hero-script section-shell">
       <div className="hero-copy reveal"><p className="kicker">Free · No sign-up to try</p><h1>No dad should have to navigate the hardest season of his life alone.</h1><p className="hero-lede">HalfTimeDad is the calm place between the message you receive and the response you choose. Start with the message in front of you: paste it, and get back a version you can send without it coming back at you later.</p><div className="hero-actions"><Link className="button button-primary" href="/login">Start free</Link><Link className="text-link" href="/#join">Become a Founding Dad →</Link></div><div className="launch-note"><span className="status-dot" /><span><strong>Free account:</strong> The Script 3 times a month, the Peace Monitor, and a play every week. Public launch January 31, 2027.</span></div></div>
       <div className="hero-script-card reveal reveal-delay" id="script"><div className="hero-script-head"><span>The Script</span><span>Try it now</span></div><ScriptForm mode="try" /><p className="script-footnote">Not saved, not stored. Education and perspective, not legal advice.</p></div>
     </section>
+    {/* Seasonal: take this out after the New Year. */}
+    <section className="holiday-band"><div className="section-shell holiday-band-inner"><p><strong>First holidays without the kids?</strong> <span>What I did with the empty house, and what a friend told me that changed how I think about all of it.</span></p><Link className="holiday-band-link" href="/read/the-first-holidays">Read &ldquo;The first holidays&rdquo; free →</Link></div></section>
     <section className="belief-band"><p>Perspective before reaction.</p><span>Kids over conflict.</span><span>Practical beats perfect.</span><span>No dad does this alone.</span></section>
     <section className="section section-shell" id="philosophy"><div className="section-heading"><p className="kicker">Before you hit send</p><h2>The pause changes everything.</h2><p>The most important feature we will ever build is the space between emotion and action. That is where a better decision begins.</p></div><div className="principle-grid">{principles.map(([n,t,d])=><article className="principle-card" key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</div></section>
     <section className="story-section" id="story"><div className="story-inner section-shell"><p className="kicker">Why we exist</p><h2>One dad answered the phone. Then another dad did the same.</h2><div className="story-columns"><p>HalfTimeDad began with a simple kind of support: someone who had already walked the road helping another father slow down, read the difficult email twice, and ask what was actually best for the kids.</p><p>Not every dad has that person. We are building the village that makes practical perspective available wherever a dad happens to be—in the school pickup line, at the kitchen table, or sitting in his truck after drop-off.</p></div><div className="story-byline"><Image src="/bill.jpg" alt="Bill Porter, founder of HalfTimeDad" width={76} height={76} /><div><strong>Bill Porter</strong><span>Founder, and one of the dads who answered the phone.</span></div></div></div></section>
