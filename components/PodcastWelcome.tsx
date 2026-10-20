@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { PODCAST_GUEST_SPOTS, type PodcastGuestSpot } from "@/content/podcast-guests";
 import { readSource, trackClient } from "@/components/Attribution";
 
@@ -30,7 +29,7 @@ export default function PodcastWelcome() {
   return (
     <section className="podcast-welcome" aria-label={`Welcome, ${spot.show} listeners`}>
       <div className="section-shell podcast-welcome-inner">
-        <Image src="/bill.jpg" alt="" width={52} height={52} className="podcast-welcome-photo" />
+        <span className="podcast-welcome-photo" aria-hidden="true">B</span>
         <div className="podcast-welcome-copy">
           <strong>Heard me on {spot.show}? Welcome.</strong>
           <span>
