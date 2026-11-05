@@ -32,17 +32,21 @@ export async function sendLetter(to: string, subject: string, html: string, text
  * Sent once, from the Stripe webhook, when a founding membership is paid.
  * Before this existed a founder paid and then heard nothing about how to get in.
  */
-export async function sendFounderWelcome(opts: { email: string; firstName?: string | null; founderNumber: string }) {
+/** founderNumber is null for members who joined at the standard price. */
+export async function sendFounderWelcome(opts: { email: string; firstName?: string | null; founderNumber: string | null }) {
   const name = opts.firstName?.trim() || "there";
-  const number = opts.founderNumber.padStart(3, "0");
+  const number = opts.founderNumber?.padStart(3, "0") ?? null;
+  const opener = number
+    ? `You're Founder #${number}. Thank you for believing in this before it was finished.`
+    : `You're in. Thank you for joining.`;
   const signIn = `${siteUrl()}/login?email=${encodeURIComponent(opts.email)}&from=welcome`;
 
-  const subject = `You're in, Founder #${number}`;
+  const subject = number ? `You're in, Founder #${number}` : `You're in`;
 
   const text = [
     `Hey ${name},`,
     ``,
-    `You're Founder #${number}. Thank you for believing in this before it was finished.`,
+    opener,
     ``,
     `Here's how to get in: open the link below, tap "Send my sign-in link," and use the link that lands in this inbox. No password, ever.`,
     ``,
@@ -60,7 +64,7 @@ export async function sendFounderWelcome(opts: { email: string; firstName?: stri
   const html = `<!doctype html><html><body style="margin:0;padding:24px;background:#ffffff;color:#1f2a24;font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.6">
 <div style="max-width:560px;margin:0 auto">
 <p>Hey ${escape(name)},</p>
-<p>You're Founder #${number}. Thank you for believing in this before it was finished.</p>
+<p>${opener}</p>
 <p>Here's how to get in: tap the button, then "Send my sign-in link," and use the link that lands in this inbox. No password, ever.</p>
 <p style="margin:28px 0"><a href="${escape(signIn)}" style="display:inline-block;background:#1f3a2c;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:6px;font-family:Arial,sans-serif;font-size:16px">Open your dashboard</a></p>
 <p>Once you're in, start with the check-in. Three questions, two minutes, once a week. It's the part that changes how the week goes.</p>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createHash, randomBytes } from "node:crypto";
+import { activeTier } from "@/content/pricing";
 import { countIssuedFounders, getFounderRowByEmail, upsertReservation } from "@/lib/supabase-admin";
 
 /**
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
     }
 
     // A returning member keeps his number, so only new people need a free seat.
-    if (!founder && (await countIssuedFounders()) >= FOUNDING_LIMIT) {
+    if (activeTier() === "founding" && !founder && (await countIssuedFounders()) >= FOUNDING_LIMIT) {
       return NextResponse.json({ message: "The Founding Hundred is full. Join the public-launch list instead." }, { status: 409 });
     }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createHash, randomBytes } from "node:crypto";
 import { getAccess } from "@/lib/access";
+import { activeTier } from "@/content/pricing";
 import { firstTouchSource } from "@/lib/analytics";
 import { CheckoutRefused, openFoundingCheckout } from "@/lib/checkout";
 import { countIssuedFounders, getFounderRowByEmail, upsertReservation } from "@/lib/supabase-admin";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
 
   try {
     const existing = await getFounderRowByEmail(access.email);
-    if (!existing && (await countIssuedFounders()) >= FOUNDING_LIMIT) {
+    if (activeTier() === "founding" && !existing && (await countIssuedFounders()) >= FOUNDING_LIMIT) {
       return NextResponse.json({ message: "The Founding Hundred is full." }, { status: 409 });
     }
 

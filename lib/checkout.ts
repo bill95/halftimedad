@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { getPriceId, getStripe } from "@/lib/stripe";
+import { activeTier } from "@/content/pricing";
 import { getFounderRowByEmail, updateReservation, type Reservation } from "@/lib/supabase-admin";
 import { firstTouchSource } from "@/lib/analytics";
 
@@ -41,6 +42,8 @@ export async function openFoundingCheckout(opts: {
   }
 
   const plan = reservation.plan_interest;
+  // Price and founding status are decided together, at the moment checkout opens.
+  const tier = activeTier();
   const source = await firstTouchSource();
   const identifierSuffix = Array.from(randomBytes(8), (byte) => String.fromCharCode(97 + (byte % 26))).join("");
 
@@ -56,9 +59,9 @@ export async function openFoundingCheckout(opts: {
     allow_promotion_codes: true,
     billing_address_collection: "auto",
     submit_type: "subscribe",
-    metadata: { reservation_id: reservation.id, founding_plan: plan, referral_code: referralCode, source },
+    metadata: { reservation_id: reservation.id, founding_plan: plan, referral_code: referralCode, source, tier },
     // founder_number is added to the subscription once payment clears.
-    subscription_data: { metadata: { reservation_id: reservation.id, founding_plan: plan } },
+    subscription_data: { metadata: { reservation_id: reservation.id, founding_plan: plan, tier } },
     custom_text: { submit: { message: "Founding pricing remains locked while your membership stays active. Cancel anytime." } },
   });
 

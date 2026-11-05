@@ -53,7 +53,7 @@ export async function getAccess(): Promise<Access | null> {
       .maybeSingle(),
     supabase
       .from("founding_members")
-      .select("founder_number, first_name, status")
+      .select("founder_number, first_name, status, founding")
       .eq("user_id", user.id)
       .maybeSingle(),
   ]);
@@ -65,7 +65,7 @@ export async function getAccess(): Promise<Access | null> {
     email: user.email ?? "",
     tier: paid ? "paid" : "free",
     firstName: founder?.first_name ?? null,
-    founderNumber: paid ? founder?.founder_number ?? null : null,
+    founderNumber: paid && founder?.founding ? founder?.founder_number ?? null : null,
     charterCurrent:
       Boolean(profile?.charter_accepted_at) && profile?.charter_version === CHARTER_VERSION,
     profile: profile ?? null,

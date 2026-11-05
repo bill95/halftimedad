@@ -181,10 +181,10 @@ export async function getFounderRowByEmail(email: string) {
   return row ?? null;
 }
 
-/** How many founder numbers have been issued to people who paid. */
+/** How many founder numbers have been issued to founders (standard-price members excluded). */
 export async function countIssuedFounders() {
   const { base, headers } = config();
-  const response = await fetch(`${base}/rest/v1/founding_members?select=founder_number`, {
+  const response = await fetch(`${base}/rest/v1/founding_members?select=founder_number&founding=is.true`, {
     headers: { ...headers, Prefer: "count=exact", Range: "0-0" },
     cache: "no-store",
   });
@@ -245,12 +245,12 @@ export async function updateReservation(id: string, values: { status?: Reservati
 }
 
 /** Issues (or returns the already-issued) founder number for a paid reservation. */
-export async function assignFounder(reservationId: string, customerId: string | null, subscriptionId: string | null) {
+export async function assignFounder(reservationId: string, customerId: string | null, subscriptionId: string | null, founding: boolean) {
   const { base, headers } = config();
   const response = await fetch(`${base}/rest/v1/rpc/assign_founder`, {
     method: "POST",
     headers: { ...headers, "Content-Type": "application/json" },
-    body: JSON.stringify({ p_reservation: reservationId, p_customer: customerId, p_subscription: subscriptionId }),
+    body: JSON.stringify({ p_reservation: reservationId, p_customer: customerId, p_subscription: subscriptionId, p_founding: founding }),
     cache: "no-store",
   });
   if (!response.ok) throw new Error(`Supabase assign_founder failed (${response.status}): ${await response.text()}`);

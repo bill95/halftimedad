@@ -14,6 +14,8 @@ export type Activation = {
   session: Stripe.Checkout.Session;
   /** Null until the payment has cleared. */
   founderNumber: string | null;
+  /** False for members who joined at the standard price. */
+  founding: boolean;
 };
 
 /**
@@ -31,32 +33,34 @@ export type Activation = {
 export async function activateCheckoutSession(sessionId: string): Promise<Activation> {
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.retrieve(sessionId);
-  if (session.mode !== "subscription" || session.status !== "complete") return { session, founderNumber: null };
+  // Sessions opened before the tier was recorded were all founding checkouts.
+  const founding = (session.metadata?.tier ?? "founding") === "founding";
+  if (session.mode !== "subscription" || session.status !== "complete") return { session, founderNumber: null, founding };
 
   const paid = session.payment_status !== "unpaid";
   const reservationId = session.metadata?.reservation_id;
 
   if (reservationId) {
-    if (!paid) return { session, founderNumber: null };
-    const number = await assignFounder(reservationId, id(session.customer), id(session.subscription));
+    if (!paid) return { session, founderNumber: null, founding };
+    const number = await assignFounder(reservationId, id(session.customer), id(session.subscription), founding);
     const subId = id(session.subscription);
     if (subId) {
       await stripe.subscriptions.update(subId, {
         metadata: { founder_number: String(number), reservation_id: reservationId, founding_plan: session.metadata?.founding_plan ?? "" },
       });
     }
-    return { session, founderNumber: String(number) };
+    return { session, founderNumber: String(number), founding };
   }
 
   const legacyNumber = session.metadata?.founder_number;
-  if (!legacyNumber) return { session, founderNumber: null };
+  if (!legacyNumber) return { session, founderNumber: null, founding };
   await updateFounder(legacyNumber, {
     status: paid ? "active" : "checkout_pending",
     stripe_customer_id: id(session.customer),
     stripe_subscription_id: id(session.subscription),
     activated_at: paid ? new Date().toISOString() : null,
   });
-  return { session, founderNumber: paid ? legacyNumber : null };
+  return { session, founderNumber: paid ? legacyNumber : null, founding };
 }
 
 async function founderNumberFor(subscription: Stripe.Subscription) {

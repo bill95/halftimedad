@@ -12,7 +12,7 @@ import { notifyNewSignup } from "@/lib/notify";
  * (stripe_webhook_events), so a retried delivery cannot send it twice. The
  * /welcome page also activates the session but never emails.
  */
-async function welcomeIfPaid({ session, founderNumber }: Activation) {
+async function welcomeIfPaid({ session, founderNumber, founding }: Activation) {
   // founderNumber is only set once the payment has cleared.
   const email = session.customer_details?.email || session.customer_email;
   if (!founderNumber || !email) return;
@@ -25,7 +25,7 @@ async function welcomeIfPaid({ session, founderNumber }: Activation) {
   });
   const firstName = await getFounderFirstName(founderNumber).catch(() => null);
   try {
-    await sendFounderWelcome({ email, firstName, founderNumber });
+    await sendFounderWelcome({ email, firstName, founderNumber: founding ? founderNumber : null });
   } catch (error) {
     // Membership is already active. A failed email must not make Stripe retry
     // the whole event; it is logged and can be resent by hand.
@@ -37,7 +37,7 @@ async function welcomeIfPaid({ session, founderNumber }: Activation) {
     email,
     firstName,
     details: {
-      "Founder #": founderNumber.padStart(3, "0"),
+      [founding ? "Founder #" : "Member #"]: founderNumber.padStart(3, "0"),
       Plan: session.metadata?.founding_plan,
       Paid: total,
       "Promo code": session.total_details?.amount_discount ? "yes" : null,

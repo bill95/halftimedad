@@ -43,7 +43,7 @@ export async function requireMember(
       .maybeSingle(),
     supabase
       .from("founding_members")
-      .select("founder_number, first_name")
+      .select("founder_number, first_name, founding")
       .eq("user_id", user.id)
       .maybeSingle(),
   ]);
@@ -59,7 +59,7 @@ export async function requireMember(
     userId: user.id,
     email: user.email ?? "",
     firstName: founder?.first_name ?? null,
-    founderNumber: founder?.founder_number ?? null,
+    founderNumber: founder?.founding ? founder.founder_number ?? null : null,
     profile: profile ?? null,
   };
 }
