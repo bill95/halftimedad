@@ -375,6 +375,33 @@ export async function logScriptTrial(row: {
   if (!response.ok) throw new Error(`Supabase script trial insert failed (${response.status}): ${await response.text()}`);
 }
 
+/** Free tools other than The Script. See supabase/2026-11-09-tool-trials.sql. */
+export async function countToolTrials(tool: string, sinceIso: string, visitor?: string) {
+  return countRows("tool_trials", {
+    tool: `eq.${tool}`,
+    created_at: `gte.${sinceIso}`,
+    ...(visitor ? { visitor: `eq.${visitor}` } : {}),
+  });
+}
+
+export async function logToolTrial(row: {
+  tool: string;
+  visitor: string;
+  variant_a: string;
+  variant_b: string;
+  input_chars: number;
+  output_chars: number;
+}) {
+  const { base, headers } = config();
+  const response = await fetch(`${base}/rest/v1/tool_trials`, {
+    method: "POST",
+    headers: { ...headers, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(row),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Supabase tool trial insert failed (${response.status}): ${await response.text()}`);
+}
+
 /** A published library piece, read past the member-only policy. Callers must check content/public-assets.ts first. */
 export async function getPublishedAssetAsAdmin(slug: string) {
   const { base, headers } = config();
