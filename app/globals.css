@@ -470,3 +470,8 @@ main.member-home > .script-footnote { margin-top: 3.5rem; padding-top: 1.4rem; b
 .answer-list a:hover { border-color: var(--forest); }
 .answer-list strong { display: block; font-family: Georgia, serif; font-size: 1.25rem; font-weight: 500; }
 .answer-list span { color: var(--muted); line-height: 1.55; }
+
+/* Toolbox: four cards, so an even 2x2 on desktop and tablet, one column on phones. */
+.tool-grid { grid-template-columns: 1fr 1fr; }
+@media (min-width: 681px) { .tool-card.featured { grid-column: auto; } }
+@media (max-width: 680px) { .tool-grid { grid-template-columns: 1fr; } }

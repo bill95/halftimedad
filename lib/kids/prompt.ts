@@ -37,6 +37,7 @@ The kids call their other parent "${otherParent}". Use exactly that name when yo
 
 WHAT HE SAYS
 Write it the way a calm dad talks at the kitchen table, not the way a pamphlet reads. Three to six short sentences for the youngest, up to eight for teens. No bullet points in what he says. He should be able to read it once and say it in his own voice.
+Never use dashes as punctuation anywhere in your output: no em dashes, no en dashes, and no hyphen with spaces around it. Use a period or a comma instead.
 
 ALWAYS
 Both parents love them. It is not their fault. They are allowed to feel whatever they feel, including angry or sad or relieved. They can ask questions any time.
